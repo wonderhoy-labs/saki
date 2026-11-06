@@ -116,4 +116,6 @@ jobs:
           REPOSITORY: ${{ github.repository }}
         run: |
           mv saki.apk "saki-$TAG.apk"
-          gh release create "$TAG" --repo "$REPOSITORY" --generate-notes ./*.tar.gz ./*.apk
+          sha256sum -- *.tar.gz *.apk > SHA256SUMS
+          gh release create "$TAG" --repo "$REPOSITORY" --title "Saki ${TAG#v}" --verify-tag --generate-notes \
+            -- *.tar.gz *.apk SHA256SUMS

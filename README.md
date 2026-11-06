@@ -30,8 +30,8 @@ through `xray0`.
 
 ![Saki on a Pixel, sharing its network](docs/screenshot.webp)
 
-> **This is early, and Linux has never been run.** The Linux code compiles for x86_64 and ARM64, but nobody has started it
-> yet, so expect problems. All our Bluetooth testing was one Pixel 10 Pro on Android 17 with one Mac on macOS 27.
+> **This is early, and Linux has never been run.** The Linux builds are compiled for x86_64 and ARM64, but nobody has started
+> one yet, so expect problems. All our Bluetooth testing was one Pixel 10 Pro on Android 17 with one Mac on macOS 27.
 > [Here's exactly what that covers.](#what-has-been-tested) If you try anything else, please
 > [open an issue](https://github.com/wonderhoy-labs/saki/issues) and tell us how it went, even if it just worked.
 
@@ -151,18 +151,18 @@ Bluetooth swapped out.
 | What | Status |
 | --- | --- |
 | Mac as server, Android VPN as client | Works over Bluetooth, with DNS, HTTP and real apps |
-| Android as server, Mac as `saki probe` | Works over Bluetooth, with real DNS through the phone |
+| Android as server, Mac as `saki probe` | Works over Bluetooth, in debug and release builds, with real DNS through the phone |
 | Pairing with the Mac as client | Works, using number comparison |
 | Pairing with the Mac as server | [Refused by macOS](#pairing) |
 | Disconnecting on Android | Works over Bluetooth |
 | Reconnecting on Android | Works over TCP on an emulator. The tunnel stays up, and traffic resumes about 3 seconds after the server returns |
 | `--dev` on macOS | Works over TCP. `en0` reaches the internet and `lo0` doesn't, so the setting takes effect |
 | Downloading and uploading at once | Works over Bluetooth |
-| **Anything on Linux, including `--dev`** | **Never run.** It only compiles |
+| **Anything on Linux, including `--dev`** | **Never run.** It only builds |
 | **`saki client` with a real TUN device on any system** | **Never run.** `saki probe` covers everything else on the client's side |
 | **An Android phone with no other network** | **Not tried.** The phone had Wi-Fi during testing |
 | **Intel Macs, ARM Linux, and x86_64 or 32-bit ARM Android** | **Built, never run.** The emulator was ARM64 |
-| **The Android app as server in a release build** | **Not run over Bluetooth.** Its Bluetooth tests used debug builds |
+| **The Android VPN in a release build** | **Not run over Bluetooth.** Its Bluetooth tests used a debug build |
 | **A sleeping phone, and battery drain** | **Not tried** |
 
 ### Speed
