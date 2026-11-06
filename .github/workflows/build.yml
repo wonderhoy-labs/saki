@@ -1,0 +1,119 @@
+name: Build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy, rustfmt
+      - name: Install BlueZ's D-Bus library
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      - run: cargo fmt --all --check
+      - run: cargo clippy --workspace --all-targets -- -D warnings
+      - run: cargo test --workspace
+
+  cli:
+    needs: test
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, target: x86_64-unknown-linux-gnu }
+          - { os: ubuntu-24.04-arm, target: aarch64-unknown-linux-gnu }
+          - { os: macos-latest, target: aarch64-apple-darwin }
+          - { os: macos-latest, target: x86_64-apple-darwin }
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - name: Install BlueZ's D-Bus library
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libdbus-1-dev pkg-config
+      - run: cargo build --release -p saki --target ${{ matrix.target }}
+      - name: Package
+        run: tar -czf saki-${{ matrix.target }}.tar.gz -C target/${{ matrix.target }}/release saki
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saki-${{ matrix.target }}
+          path: saki-${{ matrix.target }}.tar.gz
+
+  android:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi,x86_64-linux-android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Install cargo-ndk
+        run: cargo install cargo-ndk --locked
+      - name: Install the Android platform and NDK
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-37.0" "ndk;30.0.16248370"
+      # To sign with your own key, add the repository secrets SAKI_KEYSTORE_BASE64,
+      # SAKI_KEYSTORE_PASSWORD, SAKI_KEY_ALIAS and SAKI_KEY_PASSWORD. Without them the APK uses a
+      # throwaway debug key, so each release has to be installed fresh instead of updating.
+      - name: Build
+        working-directory: android
+        env:
+          KEYSTORE_BASE64: ${{ secrets.SAKI_KEYSTORE_BASE64 }}
+          SAKI_KEYSTORE_PASSWORD: ${{ secrets.SAKI_KEYSTORE_PASSWORD }}
+          SAKI_KEY_ALIAS: ${{ secrets.SAKI_KEY_ALIAS }}
+          SAKI_KEY_PASSWORD: ${{ secrets.SAKI_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/release.keystore"
+            export SAKI_KEYSTORE="$RUNNER_TEMP/release.keystore"
+          fi
+          ./gradlew :app:testDebugUnitTest :app:lintRelease :app:assembleRelease --no-daemon
+      - name: Rename the APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk saki.apk
+      - uses: actions/upload-artifact@v4
+        with:
+          name: saki-apk
+          path: saki.apk
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [cli, android]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          merge-multiple: true
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          mv saki.apk "saki-$TAG.apk"
+          gh release create "$TAG" --repo "$REPOSITORY" --generate-notes ./*.tar.gz ./*.apk

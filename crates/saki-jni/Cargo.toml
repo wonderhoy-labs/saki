@@ -1,0 +1,18 @@
+[package]
+name = "saki-jni"
+description = "The NAT from saki-core, for the Android app's server mode"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+publish.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+bytes.workspace = true
+jni-sys = "0.4"
+saki-core = { path = "../saki-core" }
+tokio.workspace = true

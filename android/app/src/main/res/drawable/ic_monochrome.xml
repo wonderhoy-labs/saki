@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The notification star, sized to sit inside an adaptive icon's safe area. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M54,30l6.2,17.8L78,54l-17.8,6.2L54,78l-6.2,-17.8L30,54l17.8,-6.2z" />
+</vector>

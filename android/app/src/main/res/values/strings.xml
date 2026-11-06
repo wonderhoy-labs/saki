@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Saki</string>
+    <string name="tagline">Networking over Bluetooth</string>
+
+    <string name="role_client">Use a server</string>
+    <string name="role_server">Share my network</string>
+
+    <string name="status_connecting">Connecting to %1$s</string>
+    <string name="status_connected">Connected to %1$s</string>
+    <string name="status_reconnecting">Link lost. Reconnecting to %1$s</string>
+    <string name="status_not_sharing">Not sharing</string>
+    <string name="status_starting">Starting</string>
+    <string name="status_sharing_none">Sharing as %1$s. Waiting for a client</string>
+    <string name="status_sharing_some">Sharing as %1$s</string>
+
+    <string name="stats_down">↓ %1$s</string>
+    <string name="stats_up">↑ %1$s</string>
+    <string name="stats_ping">%1$d ms</string>
+
+    <string name="servers_nearby">Servers nearby</string>
+    <string name="servers_looking">Looking for servers. Run <b>saki server</b> on a computer, or turn on sharing on another phone.</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="start_sharing">Start sharing</string>
+    <string name="stop_sharing">Stop sharing</string>
+    <string name="block_lan">Keep clients off my local network</string>
+    <string name="sharing_warning">Anyone you pair with can use this phone\'s internet connection.</string>
+    <string name="sharing_pairing_hint">When a new device connects, Android shows a pairing notification. You have 30 seconds to tap it.</string>
+
+    <string name="permissions_needed">Saki needs Bluetooth access to find and talk to other devices.</string>
+    <string name="permissions_grant">Allow Bluetooth</string>
+    <string name="bluetooth_off">Bluetooth is off.</string>
+    <string name="bluetooth_turn_on">Turn on Bluetooth</string>
+
+    <string name="notification_channel">Connection status</string>
+    <string name="notification_disconnect">Disconnect</string>
+    <string name="notification_stop">Stop sharing</string>
+</resources>

@@ -1,0 +1,15 @@
+# Rust
+target/
+
+# Android
+build/
+.gradle/
+.kotlin/
+local.properties
+*.jks
+*.keystore
+
+# Editors and systems
+.idea/
+.vscode/
+.DS_Store
