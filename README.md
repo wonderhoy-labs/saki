@@ -30,9 +30,8 @@ through `xray0`.
 
 ![Saki on a Pixel, sharing its network](docs/screenshot.webp)
 
-> **This is early, and Linux has never been run.** The Linux builds are compiled for x86_64 and ARM64, but nobody has started
-> one yet, so expect problems. All our Bluetooth testing was one Pixel 10 Pro on Android 17 with one Mac on macOS 27.
-> [Here's exactly what that covers.](#what-has-been-tested) If you try anything else, please
+> **This is early.** All our Bluetooth testing was one Pixel 10 Pro on Android 17, with one Mac on macOS 27 and one x86_64 Arch
+> Linux laptop. [Here's exactly what that covers.](#what-has-been-tested) If you try anything else, please
 > [open an issue](https://github.com/wonderhoy-labs/saki/issues) and tell us how it went, even if it just worked.
 
 ## What you need
@@ -55,7 +54,7 @@ Download the APK or the command-line tool for your system from
 On Android, open the APK on your phone, or install it with `adb`:
 
 ```bash
-adb install -r saki-v0.1.0.apk
+adb install -r saki-v0.1.1.apk
 ```
 
 On a computer, unpack the tool and put it on your path:
@@ -123,8 +122,8 @@ Then connect. You can leave out the name when there's only one server in range:
 sudo saki client "Pixel 10 Pro"
 ```
 
-This creates a TUN device, sends all of this machine's traffic into it and points DNS at it. It all goes back to normal
-when `saki` exits. To use a TUN device of your own and handle routing yourself, name it. On macOS, the name has to be `utun` and a number.
+This creates a TUN device, sends all of this machine's traffic into it and points DNS at it. On Linux, DNS goes through
+`systemd-resolved` if it's running, and otherwise through `/etc/resolv.conf`. It all goes back to normal when `saki` exits. To use a TUN device of your own and handle routing yourself, name it. On macOS, the name has to be `utun` and a number.
 
 ```bash
 sudo saki client --dev saki7 --no-routes --no-dns
@@ -138,28 +137,40 @@ what proves you're talking to the right device.
 - **When the Android device is the server,** Android shows a notification instead of a dialog, and you have 30 seconds to
   tap it.
 - **When the Android device is the client,** it's a normal pairing dialog.
-- **On Linux,** `saki` is written to ask in the terminal, though that hasn't been run yet.
+- **On Linux,** `saki` asks in the terminal, and refuses if it has no terminal to ask in. `--accept-pairing` accepts without
+  asking, which is for machines nobody's watching.
 - **On a Mac,** a dialog appears, but only when the Mac is the client. **A Mac can't accept a first-time pairing as a
   server.** It refuses the request, and macOS logs that there's nobody to handle it. So pair the other way around once:
   turn on sharing on the phone, and run `saki probe` on the Mac. After that the Mac works as a server for that phone.
 
 ## What has been tested
 
-"Over Bluetooth" means a real radio link between the Pixel and the Mac. The development TCP link is the rest of Saki with
+"Over Bluetooth" means a real radio link between the Pixel and a computer. The development TCP link is the rest of Saki with
 Bluetooth swapped out.
+
+We tested Linux without root. `saki client` ran in an unprivileged user and network namespace, which gives it the same
+permissions over its own network devices. **Nobody has run it with `sudo` on a machine's real routes,** or with
+`systemd-resolved` running.
 
 | What | Status |
 | --- | --- |
 | Mac as server, Android VPN as client | Works over Bluetooth, with DNS, HTTP and real apps |
 | Android as server, Mac as `saki probe` | Works over Bluetooth, in debug and release builds, with real DNS through the phone |
+| Linux as server, Android VPN as client | Works over Bluetooth, with DNS and HTTP. Disconnecting puts the phone's network back |
+| Android as server, Linux as `saki probe` | Works over Bluetooth, eight times out of eight, with real DNS through the phone |
+| `saki scan` on Linux | Finds a phone. **It doesn't find a Mac,** whose advertisement didn't show BlueZ the Saki service |
+| Pairing a phone with Linux | Works, using number comparison and `--accept-pairing` |
+| The pairing question in a Linux terminal | Appears, and refuses when told no, or when there's no terminal. **Answering yes hasn't been run** |
+| **A Mac and Linux machine with each other** | **Not finished.** The Mac finds a Linux server and asks to pair, and we stopped there because nobody was at the Mac to accept |
+| `saki client` with a real TUN device | Works on Linux, over TCP in a namespace, with IPv4, DNS and HTTPS. DNS goes back to normal on exit |
+| `--dev` on Linux | Works over TCP. `xray0` reaches the internet and `lo` doesn't, so the setting takes effect |
 | Pairing with the Mac as client | Works, using number comparison |
 | Pairing with the Mac as server | [Refused by macOS](#pairing) |
 | Disconnecting on Android | Works over Bluetooth |
 | Reconnecting on Android | Works over TCP on an emulator. The tunnel stays up, and traffic resumes about 3 seconds after the server returns |
 | `--dev` on macOS | Works over TCP. `en0` reaches the internet and `lo0` doesn't, so the setting takes effect |
 | Downloading and uploading at once | Works over Bluetooth |
-| **Anything on Linux, including `--dev`** | **Never run.** It only builds |
-| **`saki client` with a real TUN device on any system** | **Never run.** `saki probe` covers everything else on the client's side |
+| **`saki client` with a real TUN device over Bluetooth, on any system** | **Never run.** Linux refuses Bluetooth sockets inside a network namespace, so this needs `sudo`. `saki probe` covers Bluetooth, and the row above covers the TUN device |
 | **An Android phone with no other network** | **Not tried.** The phone had Wi-Fi during testing |
 | **Intel Macs, ARM Linux, and x86_64 or 32-bit ARM Android** | **Built, never run.** The emulator was ARM64 |
 | **The Android VPN in a release build** | **Not run over Bluetooth.** Its Bluetooth tests used a debug build |
@@ -167,17 +178,20 @@ Bluetooth swapped out.
 
 ### Speed
 
-Measured from the phone's end of the tunnel, with the Mac as server, a 2M PHY and 15 ms connection interval.
+Measured from the phone's end of the tunnel, with a 2M PHY and 15 ms connection interval.
 
-| Transfer | Down | Up |
-| --- | --- | --- |
-| Download | About 440 kbit/s | About 30 kbit/s |
-| Upload | About 20 kbit/s | About 420 kbit/s |
-| Both at once | 30 to 260 kbit/s | 175 to 400 kbit/s |
+| Transfer | Mac as server: down | Mac as server: up | Linux as server: down | Linux as server: up |
+| --- | --- | --- | --- | --- |
+| Download | About 440 kbit/s | About 30 kbit/s | About 130 kbit/s | |
+| Upload | About 20 kbit/s | About 420 kbit/s | | About 290 kbit/s |
+| Both at once | 30 to 260 kbit/s | 175 to 400 kbit/s | Not measured | Not measured |
 
-So that's about 450 kbit/s, shared between the two directions. It's fine for messages and light browsing, and not for
-video. Ping is 26 to 51 ms when idle and about 620 ms with the link full. The radio should have room for more, so we suspect
-the Mac's Bluetooth stack, but we haven't measured any other pair of devices.
+So with a Mac, that's about 450 kbit/s, shared between the two directions. It's fine for messages and light browsing, and not
+for video. Ping is 26 to 51 ms when idle and about 620 ms with the link full. The radio should have room for more, so we suspect
+the Mac's Bluetooth stack.
+
+With Linux as the server, downloads to the phone are slower. 130 kbit/s is almost exactly one 251-byte packet per connection
+event, so it looks like the laptop's Intel AX201 only sends one each time. We haven't measured any other adapter.
 
 ## How it works
 
@@ -281,6 +295,11 @@ tapped in time. Run it again and look for the notification.
 
 **macOS asks about Bluetooth again.** It ties the permission to the exact binary, so this happens after each update.
 
+**`saki scan` on Linux doesn't show a Mac.** We haven't got this working. [Run the server on Linux or a phone instead.](#what-has-been-tested)
+
+**`/etc/resolv.conf` says it was written by `saki client`, and it isn't running.** It normally restores this when it exits,
+but it can't after `kill -9`. What was there before is in the file as comments.
+
 **`saki client` says `couldn't open the TUN device`.** It needs root, so use `sudo`.
 
 **`saki` says it found more than one server.** Pick one by the name or ID that it lists.
@@ -299,11 +318,12 @@ permission for this. Allow it for Saki in the app's settings.
 
 ## Known issues
 
-- Nothing has been run on Linux yet.
-- `saki client` hasn't been run with a real TUN device. It needs root, and we don't know yet how Bluetooth on macOS
-  behaves under `sudo`. That may need more work.
+- `saki client` hasn't been run with a real TUN device over Bluetooth. It needs root for that, and we don't know yet how
+  Bluetooth on macOS behaves under `sudo`. That may need more work.
+- Linux doesn't find a Mac when it scans.
+- Downloads to a phone are slower with Linux as the server than with a Mac.
 - A Mac can't accept a first-time pairing as a server.
-- About 450 kbit/s, in the one setup we've measured.
+- About 450 kbit/s at best, in the setups we've measured.
 - Latency climbs to over half a second when the link is full, and one big transfer can slow everything else down.
 - Pinging through a server needs a system that allows unprivileged ICMP sockets. If it doesn't, pings just go unanswered.
 - UDP replies too big for the tunnel's 1280-byte MTU get dropped, since the stack can't fragment them.
@@ -377,6 +397,12 @@ adb forward tcp:47475 tcp:47475
 saki probe --dev-tcp 127.0.0.1:47475
 ```
 
+To test over real Bluetooth with a locked phone, this starts sharing without a tap, though a first-time pairing still needs one:
+
+```bash
+adb shell am start -n com.wonderhoylabs.saki/.ui.MainActivity --ez dev_share true
+```
+
 </details>
 
 ## Under the hood
@@ -404,6 +430,17 @@ None of this is needed to use Saki. It's here so nobody has to work it out twice
 - **We started on the `ipstack` crate and moved away.** It only checks its retransmit timers when another packet arrives,
   so a dropped tail packet stalled the connection, and in our tests a closing server's FIN never went out.
   `netstack-smoltcp` doesn't have those problems, and turning on smoltcp's `socket-tcp-reno` feature adds congestion control.
+- **BlueZ can hide what you ask it to find.** A scan filtered to the Saki service found nothing on an Intel AX201, with a phone
+  right there advertising it, and the same scan with no filter listed that phone with that service. So Saki filters for itself.
+- **BlueZ announces a device before it knows much about it.** Its services and name can arrive later, so a check made once on
+  arrival can miss a server for good.
+- **Pairing changes a phone's address.** It advertises from a random address, and pairing reveals its real one. Dialing the old
+  one after that just times out.
+- **BlueR's L2CAP `connect` can return before the channel is up.** It waits for the socket to be writable, which a new socket
+  is from the start, and the runtime can remember that. The first write then fails with `ENOTCONN`, but only sometimes. The
+  kernel's `L2CAP_CONNINFO` only answers once a channel is really open, so that's what Saki waits for.
+- **Discovering services resets the connection's priority on Android.** Asking for a high priority first gets undone, leaving a
+  45 ms interval. A Mac asks for a fast interval by itself, which hid this until Linux, where it cost two thirds of the speed.
 - **`netstack-smoltcp` answers every ping if you let it,** whether or not the destination exists, so Saki relays pings
   itself.
 

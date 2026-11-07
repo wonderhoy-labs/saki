@@ -146,6 +146,9 @@ class ClientLink private constructor(
                     runCatching { socket.close() }
                     throw IOException("Couldn't open the channel to $name: ${error.message}", error)
                 }
+                // Discovering services puts the connection's settings back to the default, which wastes
+                // most of the link. A Mac asks for a fast connection by itself, but Linux doesn't.
+                gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
                 Log.i(TAG, "channel open: sends up to ${socket.maxTransmitPacketSize}, receives up to ${socket.maxReceivePacketSize}")
                 return ClientLink(gatt, socket, name)
             } catch (error: Throwable) {
