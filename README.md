@@ -313,7 +313,7 @@ permission for this. Allow it for Saki in the app's settings.
 
 ## Development
 
-You need Rust 1.88 or newer. For the Android app you also need JDK 17 or newer, the Android SDK with platform 37, NDK 30.0.16248370
+You need Rust 1.91 or newer. For the Android app you also need JDK 17 or newer, the Android SDK with platform 37, NDK 30.0.16248370
 and [cargo-ndk](https://github.com/bbqsrc/cargo-ndk). On Linux you also need `libdbus-1` and `pkg-config`.
 
 ```bash

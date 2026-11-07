@@ -1,11 +1,15 @@
 //! The client's TUN device, and pointing the system's routes and DNS at it.
 //!
-//! All of this leans on the system's own tools (`ip`, `ifconfig`, `route`, `resolvectl`, `scutil`),
-//! so `saki -v client` shows exactly what's being changed.
+//! Nearly all of this leans on the system's own tools (`ip`, `ifconfig`, `route`, `resolvectl`,
+//! `scutil`), so `saki -v client` shows exactly what's being changed.
 
+#[cfg(target_os = "linux")]
+use crate::resolv_conf::{self, ResolvConf};
 use anyhow::{Context, Result, bail};
 use saki_core::proto::Welcome;
 use std::net::Ipv4Addr;
+#[cfg(target_os = "linux")]
+use std::path::Path;
 use std::process::Command;
 use tracing::{debug, info, warn};
 use tun::AbstractDevice;
@@ -18,6 +22,8 @@ const ROUTES_V6: [&str; 2] = ["::/1", "8000::/1"];
 pub struct Tunnel {
     name: String,
     dns_configured: bool,
+    #[cfg(target_os = "linux")]
+    resolv_conf: Option<ResolvConf>,
 }
 
 impl Tunnel {
@@ -43,7 +49,12 @@ impl Tunnel {
         })?;
         let name = device.tun_name().context("couldn't get the TUN device's name")?;
 
-        let mut tunnel = Tunnel { name, dns_configured: false };
+        let mut tunnel = Tunnel {
+            name,
+            dns_configured: false,
+            #[cfg(target_os = "linux")]
+            resolv_conf: None,
+        };
         tunnel.add_ipv6_address(welcome);
         if routes {
             tunnel.add_routes()?;
@@ -107,25 +118,32 @@ impl Tunnel {
     /// Returns whether DNS was changed. Failing here isn't fatal: the tunnel still works, and
     /// the user can point their resolver at the address themselves.
     #[cfg(target_os = "linux")]
-    fn set_dns(&self, resolver: Ipv4Addr) -> bool {
-        let resolver = resolver.to_string();
-        let result = run("resolvectl", &["dns", &self.name, &resolver])
+    fn set_dns(&mut self, resolver: Ipv4Addr) -> bool {
+        let address = resolver.to_string();
+        let result = run("resolvectl", &["dns", &self.name, &address])
             .and_then(|()| run("resolvectl", &["domain", &self.name, "~."]));
-        match result {
-            Ok(()) => {
-                info!(%resolver, "DNS now goes through the tunnel");
+        let Err(error) = result else {
+            info!(%resolver, "DNS now goes through the tunnel");
+            return true;
+        };
+        // Most likely this system just doesn't run systemd-resolved.
+        debug!("couldn't set DNS with resolvectl: {error:#}");
+        match ResolvConf::install(Path::new(resolv_conf::PATH), resolver) {
+            Ok(installed) => {
+                self.resolv_conf = Some(installed);
+                info!(%resolver, "DNS now goes through the tunnel, using {}", resolv_conf::PATH);
                 true
             }
             Err(error) => {
-                warn!("couldn't set DNS with resolvectl: {error:#}");
-                warn!("to use the tunnel's resolver, set `nameserver {resolver}` in /etc/resolv.conf");
+                warn!("couldn't change {}: {error}", resolv_conf::PATH);
+                warn!("to use the tunnel's resolver, set `nameserver {resolver}` there yourself");
                 false
             }
         }
     }
 
     #[cfg(target_os = "macos")]
-    fn set_dns(&self, resolver: Ipv4Addr) -> bool {
+    fn set_dns(&mut self, resolver: Ipv4Addr) -> bool {
         let script = format!(
             "d.init\nd.add ServerAddresses * {resolver}\nd.add SupplementalMatchDomains * \"\"\nset State:/Network/Service/saki/DNS\n"
         );
@@ -143,9 +161,15 @@ impl Tunnel {
 }
 
 impl Drop for Tunnel {
-    /// Routes vanish with the device, but this macOS DNS setting would outlive it. On Linux the
-    /// setting belongs to the device and goes away too.
+    /// Routes vanish with the device, but these DNS settings would outlive it. With
+    /// `systemd-resolved`, the setting belongs to the device and goes away too.
     fn drop(&mut self) {
+        #[cfg(target_os = "linux")]
+        if let Some(installed) = &self.resolv_conf
+            && let Err(error) = installed.restore()
+        {
+            warn!("couldn't restore {}: {error}", resolv_conf::PATH);
+        }
         #[cfg(target_os = "macos")]
         if self.dns_configured
             && let Err(error) = scutil("remove State:/Network/Service/saki/DNS\n")

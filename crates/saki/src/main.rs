@@ -3,6 +3,8 @@
 mod bt;
 mod client;
 mod probe;
+#[cfg(target_os = "linux")]
+mod resolv_conf;
 mod server;
 mod tunnel;
 
