@@ -20,6 +20,8 @@ use tokio::time::{sleep, timeout};
 use tracing::{debug, info, warn};
 use uuid::Uuid;
 
+const SCAN_START_TRIES: u32 = 10;
+const SCAN_START_RETRY: Duration = Duration::from_millis(500);
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
 const PAIRING_TIMEOUT: Duration = Duration::from_secs(60);
 const RESOLVE_TIMEOUT: Duration = Duration::from_secs(20);
@@ -219,11 +221,22 @@ impl Scanner {
             ..Default::default()
         };
         adapter.set_discovery_filter(filter).await.context("couldn't set up the scan")?;
-        let events = adapter.discover_devices().await.context("couldn't start scanning")?;
+        let mut tries = SCAN_START_TRIES;
+        let events = loop {
+            match adapter.discover_devices_with_changes().await {
+                // BlueZ takes a moment to wind down a scan that just ended, even one from another run.
+                Err(error) if error.kind == bluer::ErrorKind::InProgress && tries > 1 => {
+                    tries -= 1;
+                    sleep(SCAN_START_RETRY).await;
+                }
+                result => break result.context("couldn't start scanning")?,
+            }
+        };
         Ok(Scanner { session, adapter, agent, events: Box::pin(events), reported: HashSet::new() })
     }
 
-    /// Waits for the next server that hasn't been reported yet.
+    /// Waits for the next server that hasn't been reported yet. BlueZ can announce a device before it
+    /// knows what the device offers, so each device gets looked at again whenever it learns more.
     pub async fn next(&mut self) -> Result<Peer> {
         loop {
             let event = self.events.next().await.ok_or_else(|| anyhow!("the scan stopped"))?;
@@ -232,14 +245,12 @@ impl Scanner {
             };
             let device = self.adapter.device(address)?;
             let is_saki = device.uuids().await.ok().flatten().is_some_and(|uuids| uuids.contains(&service_uuid()));
-            if !is_saki || !self.reported.insert(address) {
+            // BlueZ also lists devices it remembers, and those without a signal aren't here right now.
+            let rssi = device.rssi().await.ok().flatten();
+            if !is_saki || rssi.is_none() || !self.reported.insert(address) {
                 continue;
             }
-            return Ok(Peer {
-                id: address.to_string(),
-                name: device.name().await.ok().flatten(),
-                rssi: device.rssi().await.ok().flatten(),
-            });
+            return Ok(Peer { id: address.to_string(), name: device.name().await.ok().flatten(), rssi });
         }
     }
 

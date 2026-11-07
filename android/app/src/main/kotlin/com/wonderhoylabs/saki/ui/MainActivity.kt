@@ -101,6 +101,8 @@ class MainActivity : ComponentActivity() {
         const val EXTRA_DEV_TCP = "dev_tcp"
         /** Debug builds only: `--ei dev_tcp_listen port` starts a server, for the same reason. */
         const val EXTRA_DEV_TCP_LISTEN = "dev_tcp_listen"
+        /** Debug builds only: `--ez dev_share true` starts sharing over Bluetooth, on a phone nobody's holding. */
+        const val EXTRA_DEV_SHARE = "dev_share"
     }
 }
 
@@ -156,6 +158,9 @@ private fun SakiScreen(devIntent: Intent?) {
         } else if (devListen != 0) {
             role = Role.Server
             ServerService.startOverTcp(context, devListen)
+        } else if (devIntent?.getBooleanExtra(MainActivity.EXTRA_DEV_SHARE, false) == true) {
+            role = Role.Server
+            ServerService.start(context, blockLan = false)
         }
     }
 
