@@ -215,11 +215,9 @@ impl Scanner {
         let session = Session::new().await.context("couldn't reach BlueZ. Is bluetoothd running?")?;
         let adapter = open_adapter(&session, options).await?;
         let agent = Arc::new(register_agent(&session, options.accept_pairing).await?);
-        let filter = DiscoveryFilter {
-            uuids: HashSet::from([service_uuid()]),
-            transport: DiscoveryTransport::Le,
-            ..Default::default()
-        };
+        // This could also ask BlueZ for only the Saki service, but that hides a phone advertising it,
+        // at least on an Intel AX201. So `next` does the choosing instead.
+        let filter = DiscoveryFilter { transport: DiscoveryTransport::Le, ..Default::default() };
         adapter.set_discovery_filter(filter).await.context("couldn't set up the scan")?;
         let mut tries = SCAN_START_TRIES;
         let events = loop {
