@@ -20,6 +20,7 @@ use tokio::time::{sleep, timeout};
 use tracing::{debug, info, warn};
 use uuid::Uuid;
 
+const OPEN_POLL_INTERVAL: Duration = Duration::from_millis(20);
 const SCAN_START_TRIES: u32 = 10;
 const SCAN_START_RETRY: Duration = Duration::from_millis(500);
 const CONNECT_TIMEOUT: Duration = Duration::from_secs(30);
@@ -295,12 +296,34 @@ impl Scanner {
         socket.bind(SocketAddr::any_le())?;
         socket.set_security(Security { level: SecurityLevel::Medium, key_size: 0 })?;
         socket.set_recv_mtu(RECV_MTU)?;
-        let stream = timeout(CONNECT_TIMEOUT, socket.connect(SocketAddr::new(address, address_type, psm)))
+        let open = async {
+            let stream = socket.connect(SocketAddr::new(address, address_type, psm)).await?;
+            wait_until_open(&stream).await?;
+            std::io::Result::Ok(stream)
+        };
+        let stream = timeout(CONNECT_TIMEOUT, open)
             .await
             .map_err(|_| anyhow!("opening the channel to {} timed out", peer.label()))?
             .context("couldn't open the L2CAP channel")?;
 
         Ok(Link { stream: Box::new(stream), keep_alive: Box::new((session, adapter, device, agent)) })
+    }
+}
+
+/// BlueR's `connect` can come back before the channel is up. It waits for the socket to be writable,
+/// which a new socket is from the start, and the runtime can remember that from before connecting.
+/// The kernel only gives out a channel's connection details once it's open, so that's the real test.
+async fn wait_until_open(stream: &l2cap::Stream) -> std::io::Result<()> {
+    loop {
+        match stream.as_ref().conn_info() {
+            Ok(_) => return Ok(()),
+            Err(error) if error.kind() == std::io::ErrorKind::NotConnected => {
+                // A channel that's still connecting has a peer. One that's failed doesn't.
+                stream.peer_addr().map_err(|_| std::io::Error::other("the server refused the channel"))?;
+                sleep(OPEN_POLL_INTERVAL).await;
+            }
+            Err(error) => return Err(error),
+        }
     }
 }
 
