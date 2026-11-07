@@ -9,7 +9,7 @@ use bluer::l2cap::{self, Security, SecurityLevel, Socket, SocketAddr};
 use bluer::{Adapter, AdapterEvent, Address, AddressType, Device, DiscoveryFilter, DiscoveryTransport, Session};
 use futures::{FutureExt, StreamExt};
 use saki_core::proto::{INFO_UUID, SERVICE_UUID, VERSION, decode_info, encode_info};
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 use std::io::{BufRead, IsTerminal, Write};
 use std::pin::Pin;
 use std::sync::Arc;
@@ -207,7 +207,7 @@ pub struct Scanner {
     adapter: Adapter,
     agent: Arc<AgentHandle>,
     events: DeviceEvents,
-    reported: HashSet<Address>,
+    reported: HashMap<Address, Option<String>>,
 }
 
 impl Scanner {
@@ -230,7 +230,7 @@ impl Scanner {
                 result => break result.context("couldn't start scanning")?,
             }
         };
-        Ok(Scanner { session, adapter, agent, events: Box::pin(events), reported: HashSet::new() })
+        Ok(Scanner { session, adapter, agent, events: Box::pin(events), reported: HashMap::new() })
     }
 
     /// Waits for the next server that hasn't been reported yet. BlueZ can announce a device before it
@@ -245,10 +245,17 @@ impl Scanner {
             let is_saki = device.uuids().await.ok().flatten().is_some_and(|uuids| uuids.contains(&service_uuid()));
             // BlueZ also lists devices it remembers, and those without a signal aren't here right now.
             let rssi = device.rssi().await.ok().flatten();
-            if !is_saki || rssi.is_none() || !self.reported.insert(address) {
+            if !is_saki || rssi.is_none() {
                 continue;
             }
-            return Ok(Peer { id: address.to_string(), name: device.name().await.ok().flatten(), rssi });
+            // Its name can arrive after the rest of it. That's worth hearing about, as the way to pick
+            // a server is by name, but its signal changing all the time isn't.
+            let name = device.name().await.ok().flatten();
+            if self.reported.get(&address) == Some(&name) {
+                continue;
+            }
+            self.reported.insert(address, name.clone());
+            return Ok(Peer { id: address.to_string(), name, rssi });
         }
     }
 
@@ -259,7 +266,6 @@ impl Scanner {
 
         let address: Address = peer.id.parse().context("the peer's address is invalid")?;
         let device = adapter.device(address)?;
-        let address_type = device.address_type().await.unwrap_or(AddressType::LePublic);
 
         if !device.is_connected().await? {
             timeout(CONNECT_TIMEOUT, device.connect())
@@ -281,6 +287,10 @@ impl Scanner {
             .map_err(|_| anyhow!("{} didn't offer the Saki service in time", peer.label()))??;
         debug!(psm, "the server's channel");
 
+        // A phone advertises from a random address, and pairing reveals its real one. So this can't
+        // be asked until now, because the old address has stopped meaning anything to the radio.
+        let address = device.remote_address().await.context("couldn't get the server's address")?;
+        let address_type = device.address_type().await.unwrap_or(AddressType::LePublic);
         let socket = Socket::<l2cap::Stream>::new_stream()?;
         socket.bind(SocketAddr::any_le())?;
         socket.set_security(Security { level: SecurityLevel::Medium, key_size: 0 })?;
