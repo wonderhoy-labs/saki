@@ -26,7 +26,9 @@ const WRITE_BATCH_BYTES: usize = 8 * 1024;
 /// Counters for one link, safe to read from anywhere.
 #[derive(Debug, Default)]
 pub struct Stats {
+	/// The bytes of IP packets sent over the link.
 	pub bytes_sent: AtomicU64,
+	/// The bytes of IP packets that arrived over the link.
 	pub bytes_received: AtomicU64,
 	/// The latest ping time in milliseconds, or zero before the first reply.
 	pub rtt_ms: AtomicU32,

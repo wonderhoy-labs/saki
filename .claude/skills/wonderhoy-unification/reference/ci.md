@@ -102,6 +102,7 @@ Uploads `<binary>-<target>.tar.gz`, or `.zip` on Windows.
 | `gradle-tasks`    | Default `spotlessCheck :app:testDebugUnitTest :app:lintRelease :app:assembleRelease` |
 | `rust-targets`    | Comma-separated Android Rust targets, which also installs the NDK and cargo-ndk      |
 | `ndk`, `platform` | Default NDK 30.0.16248370 and android-37.0                                           |
+| `library-files`   | AARs the build made, one path from `android/` per line, released as `<name>-<module>-<version>.aar` |
 
 Secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`, mapped from the repository's
 `<NAME>_*` secrets. Without them the APK is signed with a throwaway debug key.
@@ -113,6 +114,7 @@ Secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`, 
 | `apk-artifact` | For a site that serves the app: the artifact from `android.yml` to put at `apk-path` before building. The job then needs `needs: android`. |
 | `verify`       | A command run in `web/` after the build, such as checking committed generated output                                                       |
 | `pages`        | Publish `web/dist` to GitHub Pages on pushes to `main`. Default true.                                                                      |
+| `library`      | A package in `packages/` to test and pack, with the APK at `apk-path` if it carries one, for the release. See [library.md](library.md).      |
 
 The repository's Pages source has to be "GitHub Actions" (Settings → Pages).
 
@@ -124,7 +126,7 @@ publishes a GitHub release with generated notes.
 
 ## Releasing
 
-1. Bump `VERSION`, and with it the Cargo workspace version.
+1. Bump `VERSION`, and with it the Cargo workspace version and every `packages/*/package.json`.
 2. Update the README's testing notes.
 3. Commit, tag `v<VERSION>`, and push both. CI does the rest.
 

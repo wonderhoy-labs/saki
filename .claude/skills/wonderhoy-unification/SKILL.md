@@ -1,7 +1,7 @@
 ---
 
 name: wonderhoy-unification
-description: The Wonderhoy Labs unification guideline, shared by every wonderhoy-labs repository. It sets the stack, formatting, folder layout, Material 3 design, Project SEKAI branding, GitHub Actions, README and license. Use it before you create, change, review or release anything in a Wonderhoy Labs project, including adding a web app, Android app, Rust crate or tool, touching CI, colours, UI or the README, or starting a new project from wonderhoy-labs/template.
+description: The Wonderhoy Labs unification guideline, shared by every wonderhoy-labs repository. It sets the stack, formatting, folder layout, libraries, Material 3 design, Project SEKAI branding, GitHub Actions, README and license. Use it before you create, change, review or release anything in a Wonderhoy Labs project, including adding a web app, Android app, Rust crate, library or tool, using one project's code in another, touching CI, colours, UI or the README, or starting a new project from wonderhoy-labs/template.
 ---
 
 # Wonderhoy Labs unification
@@ -51,8 +51,9 @@ Every repository has the same top level. Leave out what a project doesn't have; 
 .claude/skills/wonderhoy-unification/   this skill, copied verbatim from the template
 .github/workflows/ci.yml                calls the shared workflows in wonderhoy-labs/.github
 .github/dependabot.yml
-android/                                the Android app: a Gradle project with :app
+android/                                the Android app: a Gradle project with :app, and any library modules
 web/                                    the web app: Vite, React and mdui, a pnpm workspace package
+packages/<id>/                          the TypeScript library, @wonderhoy-labs/<id>, which web/ is built on
 crates/<name>/                          Rust crates, in one Cargo workspace rooted at the top
 tools/                                  TypeScript tools (theme.ts and unify.ts are shared); tools/apple/ for Swift
 docs/                                   logo.webp, screenshots, protocol and design notes
@@ -70,6 +71,14 @@ AGENTS.md  CLAUDE.md  LICENSE  README.md  VERSION
 - `AGENTS.md` holds what an agent needs to know about this one project. `CLAUDE.md` is just `@AGENTS.md`.
 
 The full stack, versions and commands are in [reference/stack.md](reference/stack.md).
+
+## Libraries
+
+Every project is a library as well as an app, and its own app is built on that library: a TypeScript package in
+`packages/<id>/`, an Android library module, a `<id>-core` crate, or for an app that other apps talk to, a
+documented contract. Libraries are released with every version. One project uses another's code only through its
+released library, never a copy. How to build, release and use each kind is in
+[reference/library.md](reference/library.md).
 
 ## Design
 
