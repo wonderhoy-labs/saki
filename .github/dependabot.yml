@@ -17,6 +17,11 @@ updates:
       interval: weekly
     cooldown:
       default-days: 14
+    ignore:
+      # 0.4's ES modules import files without their extensions, so Node can't load them, and tools/theme.ts uses 0.3's
+      # scheme API. Move it by hand once a release fixes both.
+      - dependency-name: "@material/material-color-utilities"
+        versions: [">=0.4.0"]
     groups:
       npm:
         patterns: ["*"]
