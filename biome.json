@@ -124,10 +124,16 @@
 	},
 	"overrides": [
 		{
-			"includes": ["**/*.yml", "**/*.yaml", "**/*.md"],
+			"includes": ["**/*.yml", "**/*.yaml"],
 			"formatter": {
 				"indentStyle": "space",
 				"indentWidth": 2
+			}
+		},
+		{
+			"includes": ["**/*.md"],
+			"formatter": {
+				"enabled": false
 			}
 		}
 	]

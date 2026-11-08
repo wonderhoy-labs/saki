@@ -9,26 +9,26 @@ Every repository has a root `package.json`, even without a web app, because the 
 
 ```json
 {
-  "name": "<id>",
-  "private": true,
-  "type": "module",
-  "license": "Apache-2.0",
-  "packageManager": "pnpm@12.15.0",
-  "engines": { "node": ">=24" },
-  "wonderhoy": {
-    "name": "<Name>",
-    "tagline": "<one sentence, ending in a full stop>",
-    "character": "<Given-name Family-name as Sekaipedia writes it>",
-    "unit": "<unit>",
-    "color": "#RRGGBB"
-  },
-  "scripts": {
-    "lint": "biome ci",
-    "format": "biome check --write",
-    "typecheck": "tsc -p .",
-    "theme": "node tools/theme.ts",
-    "unify": "node tools/unify.ts"
-  }
+	"name": "<id>",
+	"private": true,
+	"type": "module",
+	"license": "Apache-2.0",
+	"packageManager": "pnpm@12.15.0",
+	"engines": { "node": ">=24" },
+	"wonderhoy": {
+		"name": "<Name>",
+		"tagline": "<one sentence, ending in a full stop>",
+		"character": "<Given-name Family-name as Sekaipedia writes it>",
+		"unit": "<unit>",
+		"color": "#RRGGBB"
+	},
+	"scripts": {
+		"lint": "biome ci",
+		"format": "biome check --write",
+		"typecheck": "tsc -p .",
+		"theme": "node tools/theme.ts",
+		"unify": "node tools/unify.ts"
+	}
 }
 ```
 
@@ -39,7 +39,8 @@ Every repository has a root `package.json`, even without a web app, because the 
   `namespace`), and import with the `.ts` extension.
 - **Biome** formats and lints TypeScript, JavaScript, JSON and CSS with the shared `biome.json`: tabs, 120
   columns, double quotes, semicolons, trailing commas, sorted imports, and the recommended rules plus a strict
-  set. `pnpm format` fixes what it can. Don't turn rules off in code with `biome-ignore` unless the reason is
+  set. It indents YAML with two spaces, since YAML can't take tabs, and leaves Markdown as written. `pnpm format`
+  fixes what it can. Don't turn rules off in code with `biome-ignore` unless the reason is
   written next to it.
 - The root `tsconfig.json` type-checks `tools/` with `strict` and `noUncheckedIndexedAccess`.
 
