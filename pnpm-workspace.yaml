@@ -1,5 +1,5 @@
 # Saki has no web app, so the workspace is just the shared tools at the top.
 packages: []
 
-# Install scripts only run for the packages listed here.
-onlyBuiltDependencies: []
+# Install scripts are off unless a package is allowed here, as `name: true`.
+allowBuilds: {}

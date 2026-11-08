@@ -7,9 +7,13 @@
 <p align="center">Full-duplex networking over Bluetooth.</p>
 
 <p align="center">
-  <a href="https://github.com/wonderhoy-labs/saki/actions/workflows/ci.yml"><img src="https://github.com/wonderhoy-labs/saki/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <a href="https://github.com/wonderhoy-labs/saki/actions/workflows/ci.yml"
+    ><img src="https://github.com/wonderhoy-labs/saki/actions/workflows/ci.yml/badge.svg" alt="CI"></a
+  >
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache 2.0"></a>
-  <a href="#license-and-credits"><img src="https://img.shields.io/badge/Tenma%20Saki-Leo%2Fneed-FFDD44" alt="Named for Tenma Saki of Leo/need"></a>
+  <a href="#license-and-credits"
+    ><img src="https://img.shields.io/badge/Tenma%20Saki-Leo%2Fneed-FFDD44" alt="Named for Tenma Saki of Leo/need"></a
+  >
 </p>
 
 Saki shares a network connection over Bluetooth. One device, the server, has the network. The other, the client, sends

@@ -9,31 +9,32 @@ Every repository has a root `package.json`, even without a web app, because the 
 
 ```json
 {
-	"name": "<id>",
-	"private": true,
-	"type": "module",
-	"license": "Apache-2.0",
-	"packageManager": "pnpm@12.15.0",
-	"engines": { "node": ">=24" },
-	"wonderhoy": {
-		"name": "<Name>",
-		"tagline": "<one sentence, ending in a full stop>",
-		"character": "<Given-name Family-name as Sekaipedia writes it>",
-		"unit": "<unit>",
-		"color": "#RRGGBB"
-	},
-	"scripts": {
-		"lint": "biome ci",
-		"format": "biome check --write",
-		"typecheck": "tsc -p .",
-		"theme": "node tools/theme.ts",
-		"unify": "node tools/unify.ts"
-	}
+  "name": "<id>",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@12.15.0",
+  "engines": { "node": ">=24" },
+  "wonderhoy": {
+    "name": "<Name>",
+    "tagline": "<one sentence, ending in a full stop>",
+    "character": "<Given-name Family-name as Sekaipedia writes it>",
+    "unit": "<unit>",
+    "color": "#RRGGBB"
+  },
+  "scripts": {
+    "lint": "biome ci",
+    "format": "biome check --write",
+    "typecheck": "tsc -p .",
+    "theme": "node tools/theme.ts",
+    "unify": "node tools/unify.ts"
+  }
 }
 ```
 
 - **pnpm only.** No `package-lock.json`, `yarn.lock` or `bun.lock`. `pnpm-workspace.yaml` lists `web` when there
-  is one. Install scripts only run for packages listed in `onlyBuiltDependencies`.
+  is one. Install scripts are off unless `allowBuilds` there allows a package; deny one you've looked at with
+  `name: false` and a comment saying why.
 - **Node 24 or newer**, which runs `.ts` files directly. Tools use only erasable TypeScript (no `enum`, no
   `namespace`), and import with the `.ts` extension.
 - **Biome** formats and lints TypeScript, JavaScript, JSON and CSS with the shared `biome.json`: tabs, 120

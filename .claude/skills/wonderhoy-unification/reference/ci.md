@@ -13,65 +13,65 @@ Keep the jobs a project needs and delete the rest. This is the template's, with 
 name: CI
 
 on:
-    push:
-        branches: [main]
-        tags: ["v*"]
-    pull_request:
-    workflow_dispatch:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
 
 permissions:
-    contents: read
+  contents: read
 
 concurrency:
-    group: ci-${{ github.ref }}
-    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-    checks:
-        uses: wonderhoy-labs/.github/.github/workflows/checks.yml@main
+  checks:
+    uses: wonderhoy-labs/.github/.github/workflows/checks.yml@main
 
-    rust:
-        uses: wonderhoy-labs/.github/.github/workflows/rust.yml@main
-        with:
-            package: template
-            targets: >-
-                [
-                  {"os": "ubuntu-24.04", "target": "x86_64-unknown-linux-gnu"},
-                  {"os": "ubuntu-24.04-arm", "target": "aarch64-unknown-linux-gnu"},
-                  {"os": "macos-latest", "target": "aarch64-apple-darwin"},
-                  {"os": "macos-latest", "target": "x86_64-apple-darwin"},
-                  {"os": "windows-latest", "target": "x86_64-pc-windows-msvc"},
-                  {"os": "windows-11-arm", "target": "aarch64-pc-windows-msvc"}
-                ]
+  rust:
+    uses: wonderhoy-labs/.github/.github/workflows/rust.yml@main
+    with:
+      package: template
+      targets: >-
+        [
+          {"os": "ubuntu-24.04", "target": "x86_64-unknown-linux-gnu"},
+          {"os": "ubuntu-24.04-arm", "target": "aarch64-unknown-linux-gnu"},
+          {"os": "macos-latest", "target": "aarch64-apple-darwin"},
+          {"os": "macos-latest", "target": "x86_64-apple-darwin"},
+          {"os": "windows-latest", "target": "x86_64-pc-windows-msvc"},
+          {"os": "windows-11-arm", "target": "aarch64-pc-windows-msvc"}
+        ]
 
-    android:
-        uses: wonderhoy-labs/.github/.github/workflows/android.yml@main
-        with:
-            name: template
-            env-prefix: TEMPLATE
-        secrets:
-            KEYSTORE_BASE64: ${{ secrets.TEMPLATE_KEYSTORE_BASE64 }}
-            KEYSTORE_PASSWORD: ${{ secrets.TEMPLATE_KEYSTORE_PASSWORD }}
-            KEY_ALIAS: ${{ secrets.TEMPLATE_KEY_ALIAS }}
-            KEY_PASSWORD: ${{ secrets.TEMPLATE_KEY_PASSWORD }}
+  android:
+    uses: wonderhoy-labs/.github/.github/workflows/android.yml@main
+    with:
+      name: template
+      env-prefix: TEMPLATE
+    secrets:
+      KEYSTORE_BASE64: ${{ secrets.TEMPLATE_KEYSTORE_BASE64 }}
+      KEYSTORE_PASSWORD: ${{ secrets.TEMPLATE_KEYSTORE_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.TEMPLATE_KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.TEMPLATE_KEY_PASSWORD }}
 
-    web:
-        permissions:
-            contents: read
-            pages: write
-            id-token: write
-        uses: wonderhoy-labs/.github/.github/workflows/web.yml@main
+  web:
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    uses: wonderhoy-labs/.github/.github/workflows/web.yml@main
 
-    release:
-        if: startsWith(github.ref, 'refs/tags/v')
-        needs: [checks, rust, android, web]
-        permissions:
-            contents: write
-            id-token: write
-            attestations: write
-        uses: wonderhoy-labs/.github/.github/workflows/release.yml@main
-        with:
-            title: Template
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [checks, rust, android, web]
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
+    uses: wonderhoy-labs/.github/.github/workflows/release.yml@main
+    with:
+      title: Template
 ```
 
 ## The shared workflows

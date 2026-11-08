@@ -1,42 +1,42 @@
 # Weekly, one pull request per ecosystem, and never for a release younger than two weeks.
 version: 2
 updates:
-    - package-ecosystem: github-actions
-      directory: /
-      schedule:
-          interval: weekly
-      cooldown:
-          default-days: 14
-      groups:
-          actions:
-              patterns: ["*"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      actions:
+        patterns: ["*"]
 
-    - package-ecosystem: npm
-      directory: /
-      schedule:
-          interval: weekly
-      cooldown:
-          default-days: 14
-      groups:
-          npm:
-              patterns: ["*"]
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      npm:
+        patterns: ["*"]
 
-    - package-ecosystem: cargo
-      directory: /
-      schedule:
-          interval: weekly
-      cooldown:
-          default-days: 14
-      groups:
-          cargo:
-              patterns: ["*"]
+  - package-ecosystem: cargo
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      cargo:
+        patterns: ["*"]
 
-    - package-ecosystem: gradle
-      directory: /android
-      schedule:
-          interval: weekly
-      cooldown:
-          default-days: 14
-      groups:
-          gradle:
-              patterns: ["*"]
+  - package-ecosystem: gradle
+    directory: /android
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 14
+    groups:
+      gradle:
+        patterns: ["*"]

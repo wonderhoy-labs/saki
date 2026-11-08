@@ -1,9 +1,21 @@
 {
 	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"vcs": {
+		"enabled": true,
+		"clientKind": "git",
+		"useIgnoreFile": true
+	},
 	"files": {
 		"ignoreUnknown": true,
-		"includes": ["**", "!**/dist", "!**/build", "!**/target", "!**/.gradle", "!**/node_modules"]
+		"includes": [
+			"**",
+			"!**/dist",
+			"!**/build",
+			"!**/target",
+			"!**/.gradle",
+			"!**/node_modules",
+			"!**/pnpm-lock.yaml"
+		]
 	},
 	"formatter": {
 		"enabled": true,
@@ -22,9 +34,27 @@
 			"bracketSpacing": true
 		}
 	},
-	"json": { "formatter": { "trailingCommas": "none" } },
-	"css": { "formatter": { "quoteStyle": "double" }, "parser": { "cssModules": false } },
-	"assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } },
+	"json": {
+		"formatter": {
+			"trailingCommas": "none"
+		}
+	},
+	"css": {
+		"formatter": {
+			"quoteStyle": "double"
+		},
+		"parser": {
+			"cssModules": false
+		}
+	},
+	"assist": {
+		"enabled": true,
+		"actions": {
+			"source": {
+				"organizeImports": "on"
+			}
+		}
+	},
 	"linter": {
 		"enabled": true,
 		"rules": {
@@ -58,7 +88,12 @@
 				"useAsConstAssertion": "error",
 				"useBlockStatements": "off",
 				"useCollapsedElseIf": "error",
-				"useConsistentArrayType": { "level": "error", "options": { "syntax": "shorthand" } },
+				"useConsistentArrayType": {
+					"level": "error",
+					"options": {
+						"syntax": "shorthand"
+					}
+				},
 				"useConst": "error",
 				"useDefaultParameterLast": "error",
 				"useExponentiationOperator": "error",
@@ -73,7 +108,12 @@
 				"useTemplate": "error"
 			},
 			"suspicious": {
-				"noConsole": { "level": "error", "options": { "allow": ["debug", "info", "warn", "error"] } },
+				"noConsole": {
+					"level": "error",
+					"options": {
+						"allow": ["debug", "info", "warn", "error"]
+					}
+				},
 				"noEmptyBlockStatements": "error",
 				"noEvolvingTypes": "error",
 				"noExplicitAny": "error",
@@ -81,5 +121,14 @@
 				"useAwait": "error"
 			}
 		}
-	}
+	},
+	"overrides": [
+		{
+			"includes": ["**/*.yml", "**/*.yaml", "**/*.md"],
+			"formatter": {
+				"indentStyle": "space",
+				"indentWidth": 2
+			}
+		}
+	]
 }
