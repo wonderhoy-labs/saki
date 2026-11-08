@@ -136,7 +136,10 @@ function checkLayout(files: string[], brand: Brand | undefined) {
 			fail(`${file}: use pnpm, not another package manager`);
 		if (/\.(py|mjs|cjs)$/.test(file)) fail(`${file}: tools are TypeScript or Rust`);
 		if (/\.(js|jsx)$/.test(file) && !file.startsWith("android/")) fail(`${file}: write TypeScript, not JavaScript`);
-		if (file.endsWith(".sh") && !file.startsWith("tools/apple/")) fail(`${file}: tools are TypeScript or Rust`);
+		// A script an app ships and runs on a device is part of the product. A script people run is a tool.
+		if (file.endsWith(".sh") && !file.startsWith("tools/apple/") && !/^(android|web)\//.test(file)) {
+			fail(`${file}: tools are TypeScript or Rust`);
+		}
 		if (file.endsWith(".swift") && !file.startsWith("tools/apple/"))
 			fail(`${file}: Swift only belongs in tools/apple`);
 		if (/^android\/[^/]+\/src\/[^/]+\/java\/.*\.kt$/.test(file)) fail(`${file}: Kotlin goes under src/*/kotlin`);

@@ -30,8 +30,9 @@ CI runs `pnpm unify --remote` on every push and pull request.
 2. **Apache License 2.0**, as the unchanged `LICENSE` text, for every repository. Never relicense.
 3. **The stack is fixed.** Web: TypeScript (ESNext), Node and pnpm, React, Vite and mdui. Android: Kotlin or Java
    with Jetpack Compose Material 3. Everything else, including command-line tools, daemons, agents and native
-   libraries: Rust. Repository tools: TypeScript run by Node, or Rust. No Python, no plain JavaScript, no shell
-   scripts outside workflow steps. The one exception is Swift that must run on Apple's own platforms, which lives
+   libraries: Rust. Repository tools: TypeScript run by Node, or Rust. No Python, no plain JavaScript, and no
+   shell scripts as tools. A script an app ships and runs on a device, like Airi's `install.sh`, is part of the
+   product and can be whatever that device runs. The one exception is Swift that must run on Apple's own platforms, which lives
    in `tools/apple/`.
 4. **Formatting is tabs shown 4 wide**, lines up to 120 columns, LF endings, a final newline. In TypeScript, CSS
    and JSON: double quotes and semicolons, from Biome. YAML and Markdown use spaces because they have to.
