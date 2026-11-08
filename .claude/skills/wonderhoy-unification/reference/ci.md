@@ -82,13 +82,14 @@ No inputs. Installs with pnpm, then runs `pnpm lint` (Biome), `pnpm typecheck` (
 
 ### `rust.yml`
 
-| Input          | Meaning                                                                                                                                                                            |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `test-os`      | JSON list of runners for fmt, Clippy and tests. Default Ubuntu and macOS. Add `windows-latest` if Windows is supported.                                                            |
-| `package`      | The crate with the binary to ship. Empty to only test.                                                                                                                             |
-| `binary`       | The binary's name, if not the package's                                                                                                                                            |
-| `targets`      | JSON list of `{"os", "target"}` to build. Linux on `ubuntu-24.04` and `ubuntu-24.04-arm`, macOS on `macos-latest` for both CPUs, Windows on `windows-latest` and `windows-11-arm`. |
-| `apt-packages` | Ubuntu packages the build needs, like `libdbus-1-dev pkg-config`                                                                                                                   |
+| Input             | Meaning                                                                                                                                                                            |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `test-os`         | JSON list of runners for fmt, Clippy and tests. Default Ubuntu and macOS. Add `windows-latest` if Windows is supported.                                                            |
+| `package`         | The crate with the binary to ship. Empty to only test.                                                                                                                             |
+| `binary`          | The binary's name, if not the package's                                                                                                                                            |
+| `targets`         | JSON list of `{"os", "target"}` to build. Linux on `ubuntu-24.04` and `ubuntu-24.04-arm`, macOS on `macos-latest` for both CPUs, Windows on `windows-latest` and `windows-11-arm`. |
+| `apt-packages`    | Ubuntu packages the build needs, like `libdbus-1-dev pkg-config`                                                                                                                   |
+| `linux-rustflags` | `RUSTFLAGS` for the Linux release builds, like `-C linker=rust-lld` for static musl binaries                                                                                       |
 
 Uploads `<binary>-<target>.tar.gz`, or `.zip` on Windows.
 
