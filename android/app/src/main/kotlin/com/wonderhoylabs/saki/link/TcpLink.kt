@@ -11,10 +11,10 @@ import java.net.Socket
  * builds never offer it.
  */
 class TcpLink(private val socket: Socket, override val peerName: String) : Link {
-    override val input: InputStream get() = socket.getInputStream()
-    override val output: OutputStream get() = socket.getOutputStream()
+	override val input: InputStream get() = socket.getInputStream()
+	override val output: OutputStream get() = socket.getOutputStream()
 
-    override fun close() {
-        runCatching { socket.close() }
-    }
+	override fun close() {
+		runCatching { socket.close() }
+	}
 }

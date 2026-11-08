@@ -1,0 +1,30 @@
+{
+	"name": "saki",
+	"private": true,
+	"type": "module",
+	"license": "Apache-2.0",
+	"packageManager": "pnpm@12.15.0",
+	"engines": {
+		"node": ">=24"
+	},
+	"wonderhoy": {
+		"name": "Saki",
+		"tagline": "Full-duplex networking over Bluetooth.",
+		"character": "Tenma Saki",
+		"unit": "Leo/need",
+		"color": "#FFDD44"
+	},
+	"scripts": {
+		"lint": "biome ci",
+		"format": "biome check --write",
+		"typecheck": "tsc -p .",
+		"theme": "node tools/theme.ts",
+		"unify": "node tools/unify.ts"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "2.6.2",
+		"@material/material-color-utilities": "0.3.0",
+		"@types/node": "26.6.6",
+		"typescript": "7.0.2"
+	}
+}

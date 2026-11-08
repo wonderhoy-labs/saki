@@ -1,2 +1,7 @@
+# Shared by every Wonderhoy Labs repository. Change it in wonderhoy-labs/template first.
+edition = "2024"
+hard_tabs = true
+tab_spaces = 4
 max_width = 120
 use_small_heuristics = "Max"
+newline_style = "Unix"
