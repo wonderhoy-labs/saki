@@ -12,6 +12,7 @@ import { type Brand, outputs, readBrand, root } from "./theme.ts";
 /** Files that are the same in every repository, copied from wonderhoy-labs/template. */
 export const SHARED = [
 	".editorconfig",
+	".gitattributes",
 	"biome.json",
 	"rustfmt.toml",
 	"LICENSE",
@@ -57,6 +58,7 @@ const TOP_LEVEL = new Set([
 const REQUIRED = [
 	".claude/skills/wonderhoy-unification/SKILL.md",
 	".editorconfig",
+	".gitattributes",
 	".github/dependabot.yml",
 	".github/workflows/ci.yml",
 	".gitignore",

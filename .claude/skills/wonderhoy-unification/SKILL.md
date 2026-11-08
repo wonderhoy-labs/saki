@@ -56,7 +56,7 @@ web/                                    the web app: Vite, React and mdui, a pnp
 crates/<name>/                          Rust crates, in one Cargo workspace rooted at the top
 tools/                                  TypeScript tools (theme.ts and unify.ts are shared); tools/apple/ for Swift
 docs/                                   logo.webp, screenshots, protocol and design notes
-.editorconfig  .gitignore  biome.json  rustfmt.toml  tsconfig.json
+.editorconfig  .gitattributes  .gitignore  biome.json  rustfmt.toml  tsconfig.json
 package.json  pnpm-lock.yaml  pnpm-workspace.yaml  Cargo.toml  Cargo.lock
 AGENTS.md  CLAUDE.md  LICENSE  README.md  VERSION
 ```
@@ -125,7 +125,7 @@ ending in "License and credits". The exact layout is in [reference/readme.md](re
 ## Changing the guideline
 
 The guideline and the shared files change in wonderhoy-labs/template first, then get copied into every
-repository in the same change. Shared files are this skill, `.editorconfig`, `biome.json`, `rustfmt.toml`,
+repository in the same change. Shared files are this skill, `.editorconfig`, `.gitattributes`, `biome.json`, `rustfmt.toml`,
 `LICENSE`, `tools/theme.ts`, `tools/unify.ts`, `web/src/ui/Brand.tsx`, `web/src/ui/wonderhoy.css` and
 `android/app/src/main/kotlin/com/wonderhoylabs/<id>/ui/Brand.kt` (which differs only in its package). Don't fork
 them in one repository. If a project truly needs to differ, write the exception and its reason in its `AGENTS.md`.

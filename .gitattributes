@@ -1,0 +1,11 @@
+# Shared by every Wonderhoy Labs repository. Change it in wonderhoy-labs/template first.
+# LF everywhere, even in a Windows checkout, because rustfmt, Biome and Spotless all check for it.
+* text=auto eol=lf
+*.bat text eol=crlf
+
+*.gif binary
+*.jar binary
+*.jks binary
+*.keystore binary
+*.png binary
+*.webp binary
