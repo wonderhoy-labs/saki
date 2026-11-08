@@ -1,0 +1,85 @@
+{
+	"$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+	"vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+	"files": {
+		"ignoreUnknown": true,
+		"includes": ["**", "!**/dist", "!**/build", "!**/target", "!**/.gradle", "!**/node_modules"]
+	},
+	"formatter": {
+		"enabled": true,
+		"indentStyle": "tab",
+		"indentWidth": 4,
+		"lineWidth": 120,
+		"lineEnding": "lf"
+	},
+	"javascript": {
+		"formatter": {
+			"quoteStyle": "double",
+			"jsxQuoteStyle": "double",
+			"semicolons": "always",
+			"trailingCommas": "all",
+			"arrowParentheses": "always",
+			"bracketSpacing": true
+		}
+	},
+	"json": { "formatter": { "trailingCommas": "none" } },
+	"css": { "formatter": { "quoteStyle": "double" }, "parser": { "cssModules": false } },
+	"assist": { "enabled": true, "actions": { "source": { "organizeImports": "on" } } },
+	"linter": {
+		"enabled": true,
+		"rules": {
+			"preset": "recommended",
+			"complexity": {
+				"noUselessCatch": "error",
+				"noUselessFragments": "error",
+				"noUselessStringConcat": "error",
+				"noUselessTernary": "error",
+				"useOptionalChain": "error",
+				"useSimplifiedLogicExpression": "off"
+			},
+			"correctness": {
+				"noUnusedFunctionParameters": "error",
+				"noUnusedImports": "error",
+				"noUnusedPrivateClassMembers": "error",
+				"noUnusedVariables": "error",
+				"useExhaustiveDependencies": "error",
+				"useHookAtTopLevel": "error"
+			},
+			"performance": {
+				"noAccumulatingSpread": "error",
+				"noDelete": "error"
+			},
+			"style": {
+				"noInferrableTypes": "error",
+				"noNonNullAssertion": "error",
+				"noParameterAssign": "error",
+				"noUnusedTemplateLiteral": "error",
+				"noUselessElse": "error",
+				"useAsConstAssertion": "error",
+				"useBlockStatements": "off",
+				"useCollapsedElseIf": "error",
+				"useConsistentArrayType": { "level": "error", "options": { "syntax": "shorthand" } },
+				"useConst": "error",
+				"useDefaultParameterLast": "error",
+				"useExponentiationOperator": "error",
+				"useExportType": "error",
+				"useForOf": "error",
+				"useImportType": "error",
+				"useNodejsImportProtocol": "error",
+				"useNumberNamespace": "error",
+				"useSelfClosingElements": "error",
+				"useShorthandFunctionType": "error",
+				"useSingleVarDeclarator": "error",
+				"useTemplate": "error"
+			},
+			"suspicious": {
+				"noConsole": { "level": "error", "options": { "allow": ["debug", "info", "warn", "error"] } },
+				"noEmptyBlockStatements": "error",
+				"noEvolvingTypes": "error",
+				"noExplicitAny": "error",
+				"noVar": "error",
+				"useAwait": "error"
+			}
+		}
+	}
+}

@@ -21,6 +21,17 @@ socket2 = { version = "0.6", features = ["all"] }
 tokio = { version = "1.54", features = ["io-util", "macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
 tracing = "0.1"
 
+# Shared by every Wonderhoy Labs repository. Every crate opts in with `[lints] workspace = true`.
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+unused_must_use = "deny"
+
+[workspace.lints.clippy]
+all = { level = "deny", priority = -1 }
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+
 [profile.release]
 codegen-units = 1
 lto = "thin"

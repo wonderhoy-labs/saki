@@ -7,11 +7,10 @@
 <p align="center">Full-duplex networking over Bluetooth.</p>
 
 <p align="center">
-  <a href="https://github.com/wonderhoy-labs/saki/actions/workflows/build.yml"><img src="https://github.com/wonderhoy-labs/saki/actions/workflows/build.yml/badge.svg" alt="Build"></a>
+  <a href="https://github.com/wonderhoy-labs/saki/actions/workflows/ci.yml"><img src="https://github.com/wonderhoy-labs/saki/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache--2.0-blue" alt="License: Apache 2.0"></a>
+  <a href="#license-and-credits"><img src="https://img.shields.io/badge/Tenma%20Saki-Leo%2Fneed-FFDD44" alt="Named for Tenma Saki of Leo/need"></a>
 </p>
-
-<p align="center"><sub>A <a href="https://github.com/wonderhoy-labs">Wonderhoy Labs</a> project</sub></p>
 
 Saki shares a network connection over Bluetooth. One device, the server, has the network. The other, the client, sends
 all of its traffic to the server over Bluetooth, in both directions at once, and it goes out from there.
@@ -37,7 +36,6 @@ through `xray0`.
 ## What you need
 
 Two devices with Bluetooth Low Energy, which is nearly anything from the last ten years, and:
-
 - **Android:** Android 10 or newer.
 - **macOS:** A recent version. It asks for permission to use Bluetooth the first time, and again after each update.
 - **Linux:** BlueZ with `bluetoothd` running, and permission to talk to it over D-Bus. Desktop sessions normally have that.
@@ -133,7 +131,6 @@ sudo saki client --dev saki7 --no-routes --no-dns
 
 The first time two devices connect, they pair. Check that the code matches on both sides before accepting, because that's
 what proves you're talking to the right device.
-
 - **When the Android device is the server,** Android shows a notification instead of a dialog, and you have 30 seconds to
   tap it.
 - **When the Android device is the client,** it's a normal pairing dialog.
@@ -152,39 +149,39 @@ We tested Linux without root. `saki client` ran in an unprivileged user and netw
 permissions over its own network devices. **Nobody has run it with `sudo` on a machine's real routes,** or with
 `systemd-resolved` running.
 
-| What | Status |
-| --- | --- |
-| Mac as server, Android VPN as client | Works over Bluetooth, with DNS, HTTP and real apps |
-| Android as server, Mac as `saki probe` | Works over Bluetooth, in debug and release builds, with real DNS through the phone |
-| Linux as server, Android VPN as client | Works over Bluetooth, with DNS and HTTP. Disconnecting puts the phone's network back |
-| Android as server, Linux as `saki probe` | Works over Bluetooth, eight times out of eight, with real DNS through the phone |
-| `saki scan` on Linux | Finds a phone. **It doesn't find a Mac,** whose advertisement didn't show BlueZ the Saki service |
-| Pairing a phone with Linux | Works, using number comparison and `--accept-pairing` |
-| The pairing question in a Linux terminal | Appears, and refuses when told no, or when there's no terminal. **Answering yes hasn't been run** |
-| **A Mac and Linux machine with each other** | **Not finished.** The Mac finds a Linux server and asks to pair, and we stopped there because nobody was at the Mac to accept |
-| `saki client` with a real TUN device | Works on Linux, over TCP in a namespace, with IPv4, DNS and HTTPS. DNS goes back to normal on exit |
-| `--dev` on Linux | Works over TCP. `xray0` reaches the internet and `lo` doesn't, so the setting takes effect |
-| Pairing with the Mac as client | Works, using number comparison |
-| Pairing with the Mac as server | [Refused by macOS](#pairing) |
-| Disconnecting on Android | Works over Bluetooth |
-| Reconnecting on Android | Works over TCP on an emulator. The tunnel stays up, and traffic resumes about 3 seconds after the server returns |
-| `--dev` on macOS | Works over TCP. `en0` reaches the internet and `lo0` doesn't, so the setting takes effect |
-| Downloading and uploading at once | Works over Bluetooth |
+| What                                                                   | Status                                                                                                                                                                  |
+| ---------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Mac as server, Android VPN as client                                   | Works over Bluetooth, with DNS, HTTP and real apps                                                                                                                      |
+| Android as server, Mac as `saki probe`                                 | Works over Bluetooth, in debug and release builds, with real DNS through the phone                                                                                      |
+| Linux as server, Android VPN as client                                 | Works over Bluetooth, with DNS and HTTP. Disconnecting puts the phone's network back                                                                                    |
+| Android as server, Linux as `saki probe`                               | Works over Bluetooth, eight times out of eight, with real DNS through the phone                                                                                         |
+| `saki scan` on Linux                                                   | Finds a phone. **It doesn't find a Mac,** whose advertisement didn't show BlueZ the Saki service                                                                        |
+| Pairing a phone with Linux                                             | Works, using number comparison and `--accept-pairing`                                                                                                                   |
+| The pairing question in a Linux terminal                               | Appears, and refuses when told no, or when there's no terminal. **Answering yes hasn't been run**                                                                       |
+| **A Mac and Linux machine with each other**                            | **Not finished.** The Mac finds a Linux server and asks to pair, and we stopped there because nobody was at the Mac to accept                                           |
+| `saki client` with a real TUN device                                   | Works on Linux, over TCP in a namespace, with IPv4, DNS and HTTPS. DNS goes back to normal on exit                                                                      |
+| `--dev` on Linux                                                       | Works over TCP. `xray0` reaches the internet and `lo` doesn't, so the setting takes effect                                                                              |
+| Pairing with the Mac as client                                         | Works, using number comparison                                                                                                                                          |
+| Pairing with the Mac as server                                         | [Refused by macOS](#pairing)                                                                                                                                            |
+| Disconnecting on Android                                               | Works over Bluetooth                                                                                                                                                    |
+| Reconnecting on Android                                                | Works over TCP on an emulator. The tunnel stays up, and traffic resumes about 3 seconds after the server returns                                                        |
+| `--dev` on macOS                                                       | Works over TCP. `en0` reaches the internet and `lo0` doesn't, so the setting takes effect                                                                               |
+| Downloading and uploading at once                                      | Works over Bluetooth                                                                                                                                                    |
 | **`saki client` with a real TUN device over Bluetooth, on any system** | **Never run.** Linux refuses Bluetooth sockets inside a network namespace, so this needs `sudo`. `saki probe` covers Bluetooth, and the row above covers the TUN device |
-| **An Android phone with no other network** | **Not tried.** The phone had Wi-Fi during testing |
-| **Intel Macs, ARM Linux, and x86_64 or 32-bit ARM Android** | **Built, never run.** The emulator was ARM64 |
-| **The Android VPN in a release build** | **Not run over Bluetooth.** Its Bluetooth tests used a debug build |
-| **A sleeping phone, and battery drain** | **Not tried** |
+| **An Android phone with no other network**                             | **Not tried.** The phone had Wi-Fi during testing                                                                                                                       |
+| **Intel Macs, ARM Linux, and x86_64 or 32-bit ARM Android**            | **Built, never run.** The emulator was ARM64                                                                                                                            |
+| **The Android VPN in a release build**                                 | **Not run over Bluetooth.** Its Bluetooth tests used a debug build                                                                                                      |
+| **A sleeping phone, and battery drain**                                | **Not tried**                                                                                                                                                           |
 
 ### Speed
 
 Measured from the phone's end of the tunnel, with a 2M PHY and 15 ms connection interval.
 
-| Transfer | Mac as server: down | Mac as server: up | Linux as server: down | Linux as server: up |
-| --- | --- | --- | --- | --- |
-| Download | About 440 kbit/s | About 30 kbit/s | About 130 kbit/s | |
-| Upload | About 20 kbit/s | About 420 kbit/s | | About 290 kbit/s |
-| Both at once | 30 to 260 kbit/s | 175 to 400 kbit/s | Not measured | Not measured |
+| Transfer     | Mac as server: down | Mac as server: up | Linux as server: down | Linux as server: up |
+| ------------ | ------------------- | ----------------- | --------------------- | ------------------- |
+| Download     | About 440 kbit/s    | About 30 kbit/s   | About 130 kbit/s      |                     |
+| Upload       | About 20 kbit/s     | About 420 kbit/s  |                       | About 290 kbit/s    |
+| Both at once | 30 to 260 kbit/s    | 175 to 400 kbit/s | Not measured          | Not measured        |
 
 So with a Mac, that's about 450 kbit/s, shared between the two directions. It's fine for messages and light browsing, and not
 for video. Ping is 26 to 51 ms when idle and about 620 ms with the link full. The radio should have room for more, so we suspect
@@ -232,7 +229,7 @@ dropped, and TCP slows down, as it would on a real network.
 **The Android app** is Kotlin, including its Bluetooth and its half of the protocol. Server mode needs that same TCP/IP stack,
 so that part is the Rust code the command-line tool uses, built into the APK with the NDK.
 
-## Security
+## Security and privacy
 
 Worth reading before you turn on a server.
 
@@ -256,31 +253,31 @@ anyone who can connect gets in. Release builds of the app don't include it, but 
 
 ### `saki server`
 
-| Option | Default | What it does |
-| --- | --- | --- |
-| `--dev DEVICE` | Follow the routing table | Network device or TUN for clients' traffic. Linux older than 5.7 needs root for this |
-| `--name NAME` | The device's name | The name clients see |
-| `--dns IPV4` | `1.1.1.1` | The resolver clients use |
-| `--no-lan` | off | Keep clients off private addresses |
-| `--adapter NAME` | The default one | Bluetooth adapter to use, Linux only |
-| `--accept-pairing` | off | Accept pairing without asking, Linux only. Anyone in range could then pair |
+| Option             | Default                  | What it does                                                                         |
+| ------------------ | ------------------------ | ------------------------------------------------------------------------------------ |
+| `--dev DEVICE`     | Follow the routing table | Network device or TUN for clients' traffic. Linux older than 5.7 needs root for this |
+| `--name NAME`      | The device's name        | The name clients see                                                                 |
+| `--dns IPV4`       | `1.1.1.1`                | The resolver clients use                                                             |
+| `--no-lan`         | off                      | Keep clients off private addresses                                                   |
+| `--adapter NAME`   | The default one          | Bluetooth adapter to use, Linux only                                                 |
+| `--accept-pairing` | off                      | Accept pairing without asking, Linux only. Anyone in range could then pair           |
 
 ### `saki client [SERVER]`
 
-| Option | Default | What it does |
-| --- | --- | --- |
-| `--dev DEVICE` | `saki0` on Linux, the next `utun` on macOS | TUN device to use, or to create |
-| `--no-routes` | off | Don't send this machine's traffic into the tunnel |
-| `--no-dns` | off | Don't point this machine's DNS at the tunnel |
-| `--once` | off | Exit when the link drops instead of reconnecting |
-| `--adapter NAME` | The default one | Bluetooth adapter to use, Linux only |
-| `--accept-pairing` | off | Accept pairing without asking, Linux only |
+| Option             | Default                                    | What it does                                      |
+| ------------------ | ------------------------------------------ | ------------------------------------------------- |
+| `--dev DEVICE`     | `saki0` on Linux, the next `utun` on macOS | TUN device to use, or to create                   |
+| `--no-routes`      | off                                        | Don't send this machine's traffic into the tunnel |
+| `--no-dns`         | off                                        | Don't point this machine's DNS at the tunnel      |
+| `--once`           | off                                        | Exit when the link drops instead of reconnecting  |
+| `--adapter NAME`   | The default one                            | Bluetooth adapter to use, Linux only              |
+| `--accept-pairing` | off                                        | Accept pairing without asking, Linux only         |
 
 ### Other commands
 
-| Command | What it does |
-| --- | --- |
-| `saki scan [--seconds N]` | Lists the servers in range. It looks for 10 seconds by default |
+| Command                           | What it does                                                                           |
+| --------------------------------- | -------------------------------------------------------------------------------------- |
+| `saki scan [--seconds N]`         | Lists the servers in range. It looks for 10 seconds by default                         |
 | `saki probe [SERVER] [--count N]` | Connects, pings the server and does a DNS lookup through it, without changing anything |
 
 Add `-v` to any of them to log more, or `-vv` for even more.
@@ -334,7 +331,19 @@ permission for this. Allow it for Saki in the app's settings.
 ## Development
 
 You need Rust 1.91 or newer. For the Android app you also need JDK 17 or newer, the Android SDK with platform 37, NDK 30.0.16248370
-and [cargo-ndk](https://github.com/bbqsrc/cargo-ndk). On Linux you also need `libdbus-1` and `pkg-config`.
+and [cargo-ndk](https://github.com/bbqsrc/cargo-ndk). On Linux you also need `libdbus-1` and `pkg-config`. The shared tools need
+Node 24 or newer and pnpm.
+
+Saki follows the [Wonderhoy Labs guideline](.claude/skills/wonderhoy-unification/SKILL.md), like every Wonderhoy Labs project.
+Format before you commit, and check the result:
+
+```bash
+cargo fmt --all && (cd android && ./gradlew spotlessApply) && pnpm format
+```
+
+```bash
+pnpm install && pnpm unify
+```
 
 ```bash
 cargo test --workspace
@@ -352,20 +361,22 @@ Adding `-Psaki.abis=arm64-v8a` builds the app faster, for one kind of device. Th
 `android/app/build/outputs/apk/release/app-release.apk`. It's signed with your debug key unless you set `SAKI_KEYSTORE`,
 `SAKI_KEYSTORE_PASSWORD`, `SAKI_KEY_ALIAS` and `SAKI_KEY_PASSWORD`.
 
-| Where | What's in it |
-| --- | --- |
-| `crates/saki-core/` | The protocol, the NAT, the DNS resolver and the session logic, shared by everything |
-| `crates/saki/src/bt/` | Bluetooth on macOS and Linux |
-| `crates/saki/src/tunnel.rs` | The client's TUN device, routes and DNS settings |
-| `crates/saki-jni/` | Lets the Android app use the NAT |
-| `android/app/src/main/kotlin/com/wonderhoylabs/saki/` | The Android app |
-| `docs/protocol.md` | The wire protocol |
+| Where                                                 | What's in it                                                                                   |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `crates/saki-core/`                                   | The protocol, the NAT, the DNS resolver and the session logic, shared by everything            |
+| `crates/saki/src/bt/`                                 | Bluetooth on macOS and Linux                                                                   |
+| `crates/saki/src/tunnel.rs`                           | The client's TUN device, routes and DNS settings                                               |
+| `crates/saki-jni/`                                    | Lets the Android app use the NAT                                                               |
+| `android/app/src/main/kotlin/com/wonderhoylabs/saki/` | The Android app                                                                                |
+| `docs/protocol.md`                                    | The wire protocol                                                                              |
+| `tools/`                                              | The shared Wonderhoy Labs tools: `theme.ts` makes the colours, `unify.ts` checks the guideline |
 
 The protocol exists in both Rust and Kotlin. Their tests check the same bytes, so change them together.
 
-Pushing a tag like `v0.1.0` builds everything and publishes a GitHub release. See
-[build.yml](.github/workflows/build.yml) for the signing secrets it can use. Without them, each release gets a throwaway
-key and has to be installed fresh instead of updating.
+Pushing a tag like `v0.1.0`, matching `VERSION`, builds everything and publishes a GitHub release through
+[ci.yml](.github/workflows/ci.yml). It signs the APK with the repository's `SAKI_KEYSTORE_BASE64`, `SAKI_KEYSTORE_PASSWORD`,
+`SAKI_KEY_ALIAS` and `SAKI_KEY_PASSWORD` secrets. Without them, each release gets a throwaway key and has to be installed
+fresh instead of updating.
 
 <details>
 <summary>Testing without Bluetooth</summary>
@@ -452,7 +463,6 @@ Saki is a [Wonderhoy Labs](https://github.com/wonderhoy-labs) project, released 
 [Apache License 2.0](LICENSE). It isn't affiliated with the Bluetooth Special Interest Group. Bluetooth is its trademark.
 
 It stands on the work of these projects, each under its own permissive license:
-
 - [smoltcp](https://github.com/smoltcp-rs/smoltcp) (0BSD) and
   [netstack-smoltcp](https://github.com/automesh-network/netstack-smoltcp) (MIT or Apache 2.0), the userspace TCP/IP stack
 - [BlueR](https://github.com/bluez/bluer) (BSD 2-Clause), for Bluetooth on Linux
@@ -460,3 +470,9 @@ It stands on the work of these projects, each under its own permissive license:
 - [rust-tun](https://github.com/meh/rust-tun) (WTFPL), for TUN devices
 - [Tokio](https://github.com/tokio-rs/tokio) (MIT), for everything asynchronous in Rust
 - [Jetpack Compose and AndroidX](https://developer.android.com/jetpack) (Apache 2.0), for the Android app
+- [Material Color Utilities](https://github.com/material-foundation/material-color-utilities) (Apache 2.0), which makes the app's
+  colours from Saki's image colour
+
+Saki is named for Tenma Saki of Leo/need, from Project SEKAI COLORFUL STAGE! feat. Hatsune Miku. Wonderhoy Labs is a fan
+project, not affiliated with SEGA, Colorful Palette or Crypton Future Media, who own Project SEKAI and its characters. The
+Apache License doesn't cover the Saki name or logo.
