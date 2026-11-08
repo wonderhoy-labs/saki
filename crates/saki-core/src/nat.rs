@@ -54,6 +54,7 @@ pub struct NatConfig {
 }
 
 impl NatConfig {
+	/// Follows the routing table, lets clients reach the local network, and sends DNS to `upstream_dns`.
 	pub fn new(upstream_dns: Ipv4Addr) -> Self {
 		NatConfig { device: None, upstream_dns, block_lan: false, allow_loopback: false }
 	}
@@ -151,6 +152,7 @@ impl Drop for Nat {
 	}
 }
 
+/// Hands a [`Nat`] packets from its client. Clones all feed the same stack.
 #[derive(Clone)]
 pub struct NatInput(mpsc::Sender<Bytes>);
 

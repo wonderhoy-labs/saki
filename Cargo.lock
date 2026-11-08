@@ -1020,7 +1020,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 
 [[package]]
 name = "saki"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "anyhow",
  "bluer",
@@ -1042,7 +1042,7 @@ dependencies = [
 
 [[package]]
 name = "saki-core"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "bytes",
  "etherparse 0.21.0",
@@ -1057,7 +1057,7 @@ dependencies = [
 
 [[package]]
 name = "saki-jni"
-version = "0.1.1"
+version = "0.2.0"
 dependencies = [
  "bytes",
  "jni-sys",

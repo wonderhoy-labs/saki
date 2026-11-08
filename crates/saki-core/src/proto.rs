@@ -14,21 +14,29 @@ pub const SERVICE_UUID: &str = "53414b49-a776-4be4-9cf4-8ac46746a50f";
 /// A characteristic that needs an encrypted link to read, which is also what starts pairing.
 pub const INFO_UUID: &str = "53414b49-a777-4be4-9cf4-8ac46746a50f";
 
+/// Opens every hello and the info characteristic.
 pub const MAGIC: [u8; 4] = *b"SAKI";
+/// The protocol version. Both ends need the same one, and a server says goodbye to any other.
 pub const VERSION: u8 = 1;
 /// The IP MTU inside the tunnel. 1280 is the smallest IPv6 allows.
 pub const MTU: u16 = 1280;
 
 /// The resolver address clients hand to their operating system. It only exists on the client.
 pub const GATEWAY_V4: Ipv4Addr = Ipv4Addr::new(10, 233, 77, 1);
+/// The client's IPv4 address in the tunnel.
 pub const CLIENT_V4: Ipv4Addr = Ipv4Addr::new(10, 233, 77, 2);
 /// The source address of the client resolver's own queries. Nothing else sends from it, so its
 /// replies can be picked out of the tunnel without colliding with an app's ports.
 pub const RESOLVER_V4: Ipv4Addr = Ipv4Addr::new(10, 233, 77, 3);
+/// The length of the tunnel's IPv4 prefix.
 pub const PREFIX_V4: u8 = 24;
+/// The tunnel's IPv6 gateway, in a unique local prefix of Saki's own.
 pub const GATEWAY_V6: Ipv6Addr = Ipv6Addr::new(0xfd53, 0x616b, 0x6900, 0, 0, 0, 0, 1);
+/// The client's IPv6 address in the tunnel.
 pub const CLIENT_V6: Ipv6Addr = Ipv6Addr::new(0xfd53, 0x616b, 0x6900, 0, 0, 0, 0, 2);
+/// The length of the tunnel's IPv6 prefix.
 pub const PREFIX_V6: u8 = 64;
+/// Where a server sends its clients' DNS unless it's told otherwise.
 pub const DEFAULT_DNS: Ipv4Addr = Ipv4Addr::new(1, 1, 1, 1);
 
 const TYPE_HELLO: u8 = 1;
@@ -44,17 +52,26 @@ const WELCOME_LEN: usize = 2 + 4 + 4 + 1 + 16 + 16 + 1 + 4;
 /// What a server tells a client about the network it's joining.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Welcome {
+	/// The largest IP packet either end sends.
 	pub mtu: u16,
+	/// The client's IPv4 address.
 	pub client_v4: Ipv4Addr,
+	/// The client's IPv4 gateway, which is also where its operating system sends DNS.
 	pub gateway_v4: Ipv4Addr,
+	/// The length of the IPv4 prefix.
 	pub prefix_v4: u8,
+	/// The client's IPv6 address.
 	pub client_v6: Ipv6Addr,
+	/// The client's IPv6 gateway.
 	pub gateway_v6: Ipv6Addr,
+	/// The length of the IPv6 prefix.
 	pub prefix_v6: u8,
+	/// The DNS server the client's resolver asks, through the tunnel.
 	pub upstream_dns: Ipv4Addr,
 }
 
 impl Welcome {
+	/// The standard addresses and MTU, with DNS going to `upstream_dns`.
 	pub fn new(upstream_dns: Ipv4Addr) -> Self {
 		Welcome {
 			mtu: MTU,
@@ -72,8 +89,11 @@ impl Welcome {
 /// Why a link is ending.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum ByeReason {
+	/// The peer is done.
 	Normal,
+	/// The peer speaks another version of the protocol.
 	VersionMismatch,
+	/// A reason this version doesn't know, by its code.
 	Unknown(u8),
 }
 
@@ -95,13 +115,23 @@ impl ByeReason {
 	}
 }
 
+/// One message on a link.
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Frame {
-	Hello { version: u8 },
+	/// The client's first frame.
+	Hello {
+		/// The client's protocol version.
+		version: u8,
+	},
+	/// The server's answer to a hello, with the network the client is joining.
 	Welcome(Welcome),
+	/// One IP packet, either way.
 	Packet(Bytes),
+	/// Asks for a pong with the same number. Saki sends the milliseconds since the link started.
 	Ping(u64),
+	/// The answer to a ping.
 	Pong(u64),
+	/// Ends the link.
 	Bye(ByeReason),
 }
 

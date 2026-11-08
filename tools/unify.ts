@@ -22,6 +22,7 @@ export const SHARED = [
 	".claude/skills/wonderhoy-unification/reference/brand.md",
 	".claude/skills/wonderhoy-unification/reference/ci.md",
 	".claude/skills/wonderhoy-unification/reference/design.md",
+	".claude/skills/wonderhoy-unification/reference/library.md",
 	".claude/skills/wonderhoy-unification/reference/readme.md",
 	".claude/skills/wonderhoy-unification/reference/stack.md",
 	"web/src/ui/Brand.tsx",
@@ -35,6 +36,7 @@ const TOP_LEVEL = new Set([
 	"android",
 	"crates",
 	"docs",
+	"packages",
 	"tools",
 	"web",
 	".editorconfig",
@@ -79,6 +81,7 @@ const SECTIONS: { title: string; required: boolean }[] = [
 	{ title: "What you need", required: true },
 	{ title: "Install", required: false },
 	{ title: "Use it", required: true },
+	{ title: "Use it in your app", required: true },
 	{ title: "What has been tested", required: true },
 	{ title: "How it works", required: true },
 	{ title: "Security and privacy", required: true },
@@ -194,6 +197,30 @@ function checkVersions(brand: Brand) {
 	}
 	const pkg = JSON.parse(read("package.json")) as { packageManager?: string };
 	if (!pkg.packageManager?.startsWith("pnpm@")) fail('package.json needs "packageManager": "pnpm@…"');
+	checkPackages(version);
+}
+
+/** TypeScript libraries, as reference/library.md describes them. */
+function checkPackages(version: string) {
+	for (const dir of exists("packages") ? readdirSync(join(root, "packages")) : []) {
+		const path = `packages/${dir}/package.json`;
+		if (!exists(path)) continue;
+		const lib = JSON.parse(read(path)) as {
+			name?: string;
+			version?: string;
+			license?: string;
+			private?: boolean;
+			exports?: Record<string, string>;
+			publishConfig?: { exports?: unknown };
+		};
+		if (lib.name !== `@wonderhoy-labs/${dir}`) fail(`${path} has to be named @wonderhoy-labs/${dir}`);
+		if (lib.version !== version) fail(`${path}'s version has to match VERSION (${version})`);
+		if (lib.license !== "Apache-2.0") fail(`${path} has to be licensed Apache-2.0`);
+		if (lib.private) fail(`${path} is a library, so it can't be private`);
+		if (!lib.exports?.["."]?.startsWith("./src/")) fail(`${path} has to export its source as "."`);
+		if (!lib.publishConfig?.exports) fail(`${path} needs publishConfig.exports pointing at its build`);
+		if (!exists(`packages/${dir}/src/index.ts`)) fail(`packages/${dir}/src/index.ts has to be its API`);
+	}
 }
 
 function checkReadme(brand: Brand) {

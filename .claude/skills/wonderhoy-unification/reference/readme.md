@@ -34,6 +34,7 @@ In this order. Sections marked optional can be left out; a project can add its o
 | What you need               | Devices, OS versions, accounts, cables                                                           |
 | Install _(optional)_        | Release downloads first, then building from source                                               |
 | Use it                      | The common tasks, each as a short `###` walkthrough                                              |
+| Use it in your app          | The library: how to add it, a short working example, and its main entry points                   |
 | What has been tested        | Exactly what ran, on which hardware and OS versions, and what never did. Speed numbers here too. |
 | How it works                | The design in plain words, with `###` parts                                                      |
 | Security and privacy        | What it can reach, what leaves the device, and what an attacker on each link could do            |

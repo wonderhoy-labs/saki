@@ -52,7 +52,7 @@ Download the APK or the command-line tool for your system from
 On Android, open the APK on your phone, or install it with `adb`:
 
 ```bash
-adb install -r saki-v0.1.1.apk
+adb install -r saki-v0.2.0.apk
 ```
 
 On a computer, unpack the tool and put it on your path:
@@ -140,6 +140,54 @@ what proves you're talking to the right device.
   server.** It refuses the request, and macOS logs that there's nobody to handle it. So pair the other way around once:
   turn on sharing on the phone, and run `saki probe` on the Mac. After that the Mac works as a server for that phone.
 
+## Use it in your app
+
+Saki's protocol, NAT and DNS resolver are a Rust library, `saki-core`. The command-line tool is built on it, and so is
+the Android app's NAT. It runs on anything Tokio does, over any reliable, ordered byte stream: Bluetooth L2CAP, TCP, a
+pipe, or a transport of your own. Add it by the release's tag:
+
+```toml
+[dependencies]
+saki-core = { git = "https://github.com/wonderhoy-labs/saki", tag = "v0.2.0" }
+```
+
+A server hands each client's stream to `serve_client`, which runs the handshake and gives that client its own NAT:
+
+```rust
+use saki_core::{nat::NatConfig, proto::DEFAULT_DNS, session::{Stats, serve_client}};
+use std::sync::Arc;
+
+let config = Arc::new(NatConfig::new(DEFAULT_DNS));
+serve_client(stream, config, Arc::new(Stats::default()), std::future::pending()).await?;
+```
+
+A client shakes hands, then connects its TUN device to the link. The device stays open across links, so a
+reconnection doesn't disturb apps:
+
+```rust
+use saki_core::session::{ClientDevice, Stats, client_handshake, run_client};
+use std::sync::Arc;
+
+let welcome = client_handshake(&mut stream).await?;
+let mut device = ClientDevice::new(tun, &welcome);
+run_client(stream, &mut device, &welcome, Arc::new(Stats::default()), std::future::pending()).await?;
+```
+
+[`examples/in_process.rs`](crates/saki-core/examples/in_process.rs) runs both ends in one process and resolves a
+name through the server: `cargo run -p saki-core --example in_process`. `cargo doc -p saki-core --open` documents
+the rest.
+
+| Module    | What it has                                                                                                   |
+| --------- | ------------------------------------------------------------------------------------------------------------- |
+| `session` | `serve_client`, `client_handshake`, `run_client` and `ClientDevice`, and `pump` for handling packets yourself |
+| `nat`     | `Nat`, one client's userspace TCP/IP stack, which ends its connections in ordinary sockets, and `NatConfig`   |
+| `dns`     | `DnsResolver`, the client's own caching resolver                                                              |
+| `proto`   | The frames, the tunnel's addresses, and the Bluetooth service and characteristic UUIDs                        |
+
+`saki-core` follows the protocol in [`docs/protocol.md`](docs/protocol.md), so it talks to every Saki build of the
+same protocol version, including the Android app. Below 1.0, a release that changes the API bumps the minor version
+and says what changed.
+
 ## What has been tested
 
 "Over Bluetooth" means a real radio link between the Pixel and a computer. The development TCP link is the rest of Saki with
@@ -168,6 +216,7 @@ permissions over its own network devices. **Nobody has run it with `sudo` on a m
 | `--dev` on macOS                                                       | Works over TCP. `en0` reaches the internet and `lo0` doesn't, so the setting takes effect                                                                               |
 | Downloading and uploading at once                                      | Works over Bluetooth                                                                                                                                                    |
 | **`saki client` with a real TUN device over Bluetooth, on any system** | **Never run.** Linux refuses Bluetooth sockets inside a network namespace, so this needs `sudo`. `saki probe` covers Bluetooth, and the row above covers the TUN device |
+| `saki-core` on its own, in another program                             | Works on macOS: `examples/in_process.rs` runs a server and client over an in-memory pipe and resolves a name through the server's NAT                                   |
 | **An Android phone with no other network**                             | **Not tried.** The phone had Wi-Fi during testing                                                                                                                       |
 | **Intel Macs, ARM Linux, and x86_64 or 32-bit ARM Android**            | **Built, never run.** The emulator was ARM64                                                                                                                            |
 | **The Android VPN in a release build**                                 | **Not run over Bluetooth.** Its Bluetooth tests used a debug build                                                                                                      |
@@ -373,7 +422,7 @@ Adding `-Psaki.abis=arm64-v8a` builds the app faster, for one kind of device. Th
 
 The protocol exists in both Rust and Kotlin. Their tests check the same bytes, so change them together.
 
-Pushing a tag like `v0.1.0`, matching `VERSION`, builds everything and publishes a GitHub release through
+Pushing a tag like `v0.2.0`, matching `VERSION`, builds everything and publishes a GitHub release through
 [ci.yml](.github/workflows/ci.yml). It signs the APK with the repository's `SAKI_KEYSTORE_BASE64`, `SAKI_KEYSTORE_PASSWORD`,
 `SAKI_KEY_ALIAS` and `SAKI_KEY_PASSWORD` secrets. Without them, each release gets a throwaway key and has to be installed
 fresh instead of updating.

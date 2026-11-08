@@ -14,7 +14,7 @@ Android, and any of them can be either end. Named for Tenma Saki of Leo/need.
 
 | Path                | What                                                                                               |
 | ------------------- | -------------------------------------------------------------------------------------------------- |
-| `crates/saki-core/` | Protocol, NAT, DNS resolver and session logic, shared by everything                                |
+| `crates/saki-core/` | Protocol, NAT, DNS resolver and session logic, shared by everything, and the library others use    |
 | `crates/saki/`      | The command-line tool: Bluetooth on macOS (`objc2`) and Linux (BlueR), and the client's TUN device |
 | `crates/saki-jni/`  | Lets the Android app use the Rust NAT                                                              |
 | `android/`          | The Android app, which builds `saki-jni` with cargo-ndk                                            |
@@ -37,6 +37,9 @@ On Linux the Rust build needs `libdbus-1-dev` and `pkg-config`. `-Psaki.abis=arm
   add a GATT data path, without asking. A small GATT characteristic only shares the PSM and starts pairing.
 - **Write "Saki"** in prose, UI and logs. Lowercase only for identifiers: the `saki` command, crate names,
   `com.wonderhoylabs.saki`, `saki=debug`.
+- **`saki-core` is a library other programs use** by a Cargo git dependency on a release tag. Every public item has
+  a doc comment (`#![warn(missing_docs)]`), `examples/in_process.rs` has to keep working, and the README's "Use it
+  in your app" has to match the API. Changing the API bumps the minor version.
 - **The protocol exists in Rust and Kotlin.** Their tests check the same bytes, so change both together, and
   `docs/protocol.md` with them.
 - **Test UI on the emulator** (AVD `Medium_Phone_API_37.0`), not the maintainer's phone, and look at the pictures.
