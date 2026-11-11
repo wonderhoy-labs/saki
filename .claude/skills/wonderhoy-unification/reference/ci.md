@@ -115,6 +115,10 @@ Secrets `KEYSTORE_BASE64`, `KEYSTORE_PASSWORD`, `KEY_ALIAS` and `KEY_PASSWORD`, 
 | `verify`       | A command run in `web/` after the build, such as checking committed generated output                                                       |
 | `pages`        | Publish `web/dist` to GitHub Pages on pushes to `main`. Default true.                                                                      |
 | `library`      | A package in `packages/` to test and pack, with the APK at `apk-path` if it carries one, for the release. See [library.md](library.md).      |
+| `release-files` | A glob of files the build leaves in `web/dist` for the release, such as an Isolated Web App's signed `.swbn`                              |
+
+Secret `WEB_BUNDLE_KEY`, mapped from the repository's `<NAME>_IWA_KEY`, reaches the build as an environment variable of
+the same name, for a site that signs a web bundle. Without it the build leaves the bundle out.
 
 The repository's Pages source has to be "GitHub Actions" (Settings → Pages).
 
