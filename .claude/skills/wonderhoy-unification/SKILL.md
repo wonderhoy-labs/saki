@@ -88,8 +88,7 @@ Everything is Material 3, in the character's colours, and looks like one family 
   Never edit those by hand, and never use dynamic (wallpaper) colour: the brand has to show.
 - **Both light and dark**, following the system.
 - **The same frame everywhere**: the logo and name at the top (`AppBar` on the web, `BrandHeader` on Android),
-  content in Material cards, and the line "A Wonderhoy Labs project, named for … of …" at the bottom of the main
-  screen (`Footer`, `BrandFooter`).
+  and content in Material cards. No footer: who it's named for goes in the README's badge and credits.
 - **Type**: Roboto Flex on the web, the system's Roboto through Material's type scale on Android.
 
 The details, component choices and spacing are in [reference/design.md](reference/design.md).
@@ -97,7 +96,7 @@ The details, component choices and spacing are in [reference/design.md](referenc
 ## Brand
 
 Every project is named for a Project SEKAI character, uses that character's image colour, and says so in its
-README badge, its footer and its credits. Wonderhoy Labs is a fan project, and the credits say that too. The
+README badge and its credits. Wonderhoy Labs is a fan project, and the credits say that too. The
 character list, naming and exact wording are in [reference/brand.md](reference/brand.md).
 
 ## GitHub Actions

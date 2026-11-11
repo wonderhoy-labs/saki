@@ -29,7 +29,6 @@ Every app has the same frame around its own content.
 | ------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Top                       | `AppBar` from `web/src/ui/Brand.tsx`: logo, name, the page's own actions, a GitHub link | `BrandHeader` from `ui/Brand.kt`: logo, name in `primary`, a one-line subtitle |
 | Background                | `.app` from `wonderhoy.css`: a faint wash of the primary and tertiary containers        | `MaterialTheme.colorScheme.background`                                         |
-| Bottom of the main screen | `Footer`: "A Wonderhoy Labs project, named for … of …" with a dot in the brand colour   | `BrandFooter`, the same line                                                   |
 | Edges                     | `--page-gutter`: 24px, 32px from 840px wide                                             | `safeDrawingPadding()` and 24dp sides                                          |
 
 A screen that fills the whole window on purpose, like a remote desktop or a full-screen log, can leave the frame

@@ -13,16 +13,17 @@ prose and UI ("Saki"), and lowercase only where it's an identifier (`saki`, `com
 
 The colour is the character's image colour as [Sekaipedia](https://www.sekaipedia.org) gives it, in capitals.
 
-| Project   | Character      | Unit                 | Image colour |
-| --------- | -------------- | -------------------- | ------------ |
-| Asahi     | Asahina Mafuyu | 25-ji, Nightcord de. | `#8888CC`    |
-| Airi      | Momoi Airi     | MORE MORE JUMP!      | `#FFAACC`    |
-| Otori     | Otori Emu      | Wonderlands×Showtime | `#FF66BB`    |
-| Shinonome | Shinonome Ena  | 25-ji, Nightcord de. | `#CCAA88`    |
-| Shira     | Shiraishi An   | Vivid BAD SQUAD      | `#00BBDD`    |
-| Akiyama   | Akiyama Mizuki | 25-ji, Nightcord de. | `#DDAACC`    |
-| Saki      | Tenma Saki     | Leo/need             | `#FFDD44`    |
-| Template  | Hatsune Miku   | VIRTUAL SINGER       | `#33CCBB`    |
+| Project   | Character       | Unit                 | Image colour |
+| --------- | --------------- | -------------------- | ------------ |
+| Asahi     | Asahina Mafuyu  | 25-ji, Nightcord de. | `#8888CC`    |
+| Airi      | Momoi Airi      | MORE MORE JUMP!      | `#FFAACC`    |
+| Otori     | Otori Emu       | Wonderlands×Showtime | `#FF66BB`    |
+| Shinonome | Shinonome Ena   | 25-ji, Nightcord de. | `#CCAA88`    |
+| Shira     | Shiraishi An    | Vivid BAD SQUAD      | `#00BBDD`    |
+| Akiyama   | Akiyama Mizuki  | 25-ji, Nightcord de. | `#DDAACC`    |
+| Saki      | Tenma Saki      | Leo/need             | `#FFDD44`    |
+| Minori    | Hanasato Minori | MORE MORE JUMP!      | `#FFCCAA`    |
+| Template  | Hatsune Miku    | VIRTUAL SINGER       | `#33CCBB`    |
 
 These names are taken. For a new project, pick another character, check the image colour on their Sekaipedia
 page, and add a row here in the template.
@@ -31,8 +32,6 @@ page, and add a row here in the template.
 
 - **README badge**: `img.shields.io/badge/<Character>-<Unit>-<colour>`, linking to the credits. `pnpm unify`
   checks the exact markup.
-- **Footer** of the main screen, on the web and Android: "A Wonderhoy Labs project, named for <Character> of
-  <Unit>."
 - **Colours**: everything in the app comes from the image colour (see [design.md](design.md)).
 - **Logo**: the maintainer's art for the project. Agents never make one.
 
