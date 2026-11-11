@@ -23,6 +23,7 @@ The colour is the character's image colour as [Sekaipedia](https://www.sekaipedi
 | Akiyama   | Akiyama Mizuki  | 25-ji, Nightcord de. | `#DDAACC`    |
 | Saki      | Tenma Saki      | Leo/need             | `#FFDD44`    |
 | Minori    | Hanasato Minori | MORE MORE JUMP!      | `#FFCCAA`    |
+| Shiho     | Hinomori Shiho  | Leo/need             | `#BBDD22`    |
 | Template  | Hatsune Miku    | VIRTUAL SINGER       | `#33CCBB`    |
 
 These names are taken. For a new project, pick another character, check the image colour on their Sekaipedia

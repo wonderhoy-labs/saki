@@ -149,17 +149,26 @@ ${lines.join("\n")}
 `;
 }
 
+/** One property of brand.ts, wrapped the way Biome wraps it when it doesn't fit in 120 columns with tabs 4 wide. */
+function tsField(key: string, value: string): string {
+	const text = JSON.stringify(value);
+	return 4 + key.length + 2 + text.length + 1 > 120 ? `\t${key}:\n\t\t${text},` : `\t${key}: ${text},`;
+}
+
 export function ts(brand: Brand): string {
+	const fields: [string, string][] = [
+		["name", brand.name],
+		["id", brand.id],
+		["tagline", brand.tagline],
+		["character", brand.character],
+		["unit", brand.unit],
+		["color", brand.color],
+		["repository", `https://github.com/wonderhoy-labs/${brand.id}`],
+	];
 	return `${header(brand, "// ")}
 
 export const brand = {
-\tname: ${JSON.stringify(brand.name)},
-\tid: ${JSON.stringify(brand.id)},
-\ttagline: ${JSON.stringify(brand.tagline)},
-\tcharacter: ${JSON.stringify(brand.character)},
-\tunit: ${JSON.stringify(brand.unit)},
-\tcolor: ${JSON.stringify(brand.color)},
-\trepository: ${JSON.stringify(`https://github.com/wonderhoy-labs/${brand.id}`)},
+${fields.map(([key, value]) => tsField(key, value)).join("\n")}
 } as const;
 `;
 }
