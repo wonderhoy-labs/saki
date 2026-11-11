@@ -207,8 +207,6 @@ private fun SakiScreen(devIntent: Intent?) {
 
 			else -> ServerPanel(server)
 		}
-
-		BrandFooter(modifier = Modifier.padding(top = 8.dp))
 	}
 }
 
