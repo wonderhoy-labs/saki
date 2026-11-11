@@ -52,7 +52,7 @@ Download the APK or the command-line tool for your system from
 On Android, open the APK on your phone, or install it with `adb`:
 
 ```bash
-adb install -r saki-v0.2.0.apk
+adb install -r saki-v0.2.1.apk
 ```
 
 On a computer, unpack the tool and put it on your path:
@@ -148,7 +148,7 @@ pipe, or a transport of your own. Add it by the release's tag:
 
 ```toml
 [dependencies]
-saki-core = { git = "https://github.com/wonderhoy-labs/saki", tag = "v0.2.0" }
+saki-core = { git = "https://github.com/wonderhoy-labs/saki", tag = "v0.2.1" }
 ```
 
 A server hands each client's stream to `serve_client`, which runs the handshake and gives that client its own NAT:
